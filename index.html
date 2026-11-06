@@ -651,14 +651,14 @@
     </div>
 
     <script>
-        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v27')) || [
+        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v28')) || [
             { id: '1', instrumento: 'Bateria', musico: 'Lucas' },
             { id: '2', instrumento: 'Baixo', musico: 'Matheus' },
             { id: '3', instrumento: 'Teclado', musico: 'Marcos' },
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
-        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v27')) || [
+        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v28')) || [
             { id: '1', nome: 'Tati' },
             { id: '2', nome: 'Ana' },
             { id: '3', nome: 'Samuel' },
@@ -666,17 +666,17 @@
             { id: '5', nome: 'Gabriel' }
         ];
 
-        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v27')) || [
+        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v28')) || [
             { id: '1', nome: 'Nara Julia' },
             { id: '2', nome: 'Livia' },
             { id: '3', nome: 'Elizama' },
             { id: '4', nome: 'Salete' }
         ];
 
-        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v27')) || [];
-        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v27')) || [];
-        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v27')) || [];
-        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v27') || null;
+        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v28')) || [];
+        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v28')) || [];
+        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v28')) || [];
+        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v28') || null;
 
         let musicaAtualEmExibicao = null;
         let tomAtualTransposicao = 0;
@@ -710,7 +710,7 @@
         };
 
         window.onload = function() {
-            const savedBg = localStorage.getItem('igreja_theme_bg_v27') || 'preto';
+            const savedBg = localStorage.getItem('igreja_theme_bg_v28') || 'preto';
             mudarFundo(savedBg);
             document.getElementById('selectBg').value = savedBg;
 
@@ -728,7 +728,7 @@
         function mudarFundo(cor) {
             document.body.classList.remove('theme-bg-preto', 'theme-bg-crimson', 'theme-bg-midnight', 'theme-bg-lime', 'theme-bg-orange', 'theme-bg-neon', 'theme-bg-pink', 'theme-bg-branco');
             document.body.classList.add(`theme-bg-${cor}`);
-            localStorage.setItem('igreja_theme_bg_v27', cor);
+            localStorage.setItem('igreja_theme_bg_v28', cor);
         }
 
         function mudarAba(aba) {
@@ -752,13 +752,13 @@
         }
 
         function salvarTudo() {
-            localStorage.setItem('igreja_banda_v27', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_cantores_v27', JSON.stringify(cantores));
-            localStorage.setItem('igreja_convidados_v27', JSON.stringify(convidados));
-            localStorage.setItem('igreja_repertorio_v27', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_cultos_v27', JSON.stringify(cultos));
-            localStorage.setItem('igreja_historico_v27', JSON.stringify(historicoEscalas));
-            localStorage.setItem('igreja_escala_ativa_titulo_v27', escalaAtivaTitulo || '');
+            localStorage.setItem('igreja_banda_v28', JSON.stringify(bandaFixa));
+            localStorage.setItem('igreja_cantores_v28', JSON.stringify(cantores));
+            localStorage.setItem('igreja_convidados_v28', JSON.stringify(convidados));
+            localStorage.setItem('igreja_repertorio_v28', JSON.stringify(repertorio));
+            localStorage.setItem('igreja_cultos_v28', JSON.stringify(cultos));
+            localStorage.setItem('igreja_historico_v28', JSON.stringify(historicoEscalas));
+            localStorage.setItem('igreja_escala_ativa_titulo_v28', escalaAtivaTitulo || '');
             
             const status = document.getElementById('statusSalvar');
             status.innerText = "Dados guardados!";
@@ -779,7 +779,7 @@
 
         function fecharBalaoEscala() {
             escalaAtivaTitulo = null;
-            localStorage.removeItem('igreja_escala_ativa_titulo_v27');
+            localStorage.removeItem('igreja_escala_ativa_titulo_v28');
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
 
@@ -1161,7 +1161,7 @@
                 if (hist.cultos) {
                     hist.cultos.forEach(culto => {
                         if (culto.data && culto.data.startsWith(`${ano}-${mes}`)) {
-                            if (culto.momentos) hist.cultos.forEach(m => { if (m.ministro === nome) count++; }); // fallback seguro
+                            if (culto.momentos) hist.cultos.forEach(m => { if (m.ministro === nome) count++; });
                         }
                     });
                 }
@@ -1277,7 +1277,7 @@
         function adicionarMomento(cultoId) {
             const culto = cultos.find(c => c.id === cultoId);
             if (culto) {
-                const nomeMomento = prompt("Nome do novo momento de louvor:", "LOUVOR ESPECIAL");
+                const nomeMomento = prompt("Nome do novo bloco de louvor:", "LOUVOR ESPECIAL");
                 if (!nomeMomento) return;
                 if (!culto.momentos) culto.momentos = [];
                 culto.momentos.push({ id: Date.now().toString(), titulo: nomeMomento.toUpperCase(), ministro: '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] });
@@ -1470,19 +1470,19 @@
                     `).join('');
 
                     return `
-                        <div class="sub-card p-5 rounded-2xl space-y-3.5 relative">
-                            <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                        <div class="sub-card p-5 rounded-2xl space-y-3.5 relative border border-white/10">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/5 pb-3">
                                 <span class="text-sm font-black uppercase dynamic-accent tracking-wider"><i class="fa-solid fa-music"></i> ${m.titulo}</span>
-                                <div class="flex items-center gap-3">
+                                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                                     <div class="flex items-center gap-2">
                                         <span class="text-sm text-muted-custom font-bold">Ministro:</span>
-                                        <select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-4 py-2.5 text-sm font-bold">
+                                        <select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-4 py-2 text-sm font-bold">
                                             <option value="">-- Selecionar --</option>
                                             ${todosCantoresDisponiveis.map(nome => `<option value="${nome}" ${m.ministro === nome ? 'selected' : ''}>${nome}</option>`).join('')}
                                         </select>
                                     </div>
-                                    <button onclick="removerMomento('${culto.id}', '${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20" title="Remover este momento de louvor">
-                                        <i class="fa-solid fa-trash-can"></i> Remover Linha
+                                    <button onclick="removerMomento('${culto.id}', '${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-3 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 font-bold flex items-center gap-1.5" title="Remover este bloco inteiro">
+                                        <i class="fa-solid fa-trash-can"></i> Remover Bloco
                                     </button>
                                 </div>
                             </div>
@@ -1507,13 +1507,13 @@
                             <span class="text-xs font-bold text-muted-custom uppercase block mb-2.5">Banda Fixa:</span>
                             <div class="flex flex-wrap gap-2.5">${bandaHtml}</div>
                         </div>
-                        <div class="space-y-3.5">
-                            <span class="text-xs font-bold text-muted-custom uppercase block">Cantores e Repertorio:</span>
+                        <div class="space-y-4">
+                            <span class="text-xs font-bold text-muted-custom uppercase block">Blocos de Louvor e Ministros:</span>
                             ${momentosHtml}
                         </div>
                         <div class="pt-3 flex justify-center">
                             <button onclick="adicionarMomento('${culto.id}')" class="btn-secondary-custom px-5 py-3 rounded-xl text-xs font-bold">
-                                <i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Momento / Linha
+                                <i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Novo Bloco de Louvor
                             </button>
                         </div>
                     </div>
