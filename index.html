@@ -172,10 +172,7 @@
 
         <!-- MENU DE ABAS -->
         <div id="menuAbasAdmin" class="flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
-            <button onclick="mudarAba('escala')" id="tab-escala" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
-                <i class="fa-solid fa-calendar-days"></i> Escala Ativa
-            </button>
-            <button onclick="mudarAba('historico')" id="tab-historico" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
+            <button onclick="mudarAba('historico')" id="tab-historico" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
                 <i class="fa-solid fa-folder-open"></i> Escalas Salvas
             </button>
             <button onclick="mudarAba('repertorio')" id="tab-repertorio" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
@@ -184,16 +181,19 @@
             <button onclick="mudarAba('listacifras')" id="tab-listacifras" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
                 <i class="fa-solid fa-book-open"></i> Lista de Cifras
             </button>
+            <button onclick="mudarAba('escala')" id="tab-escala" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
+                <i class="fa-solid fa-calendar-days"></i> Escala Ativa (Admin)
+            </button>
             <button onclick="mudarAba('pessoas')" id="tab-pessoas" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
-                <i class="fa-solid fa-users-gear"></i> Banda e Cantores
+                <i class="fa-solid fa-users-gear"></i> Banda e Cantores (Admin)
             </button>
             <button onclick="mudarAba('convidados')" id="tab-convidados" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
-                <i class="fa-solid fa-star"></i> Convidados
+                <i class="fa-solid fa-star"></i> Convidados (Admin)
             </button>
         </div>
 
         <!-- CONTEUDO: ESCALA ATIVA -->
-        <div id="conteudo-escala" class="space-y-6">
+        <div id="conteudo-escala" class="space-y-6 hidden">
             <div id="blocoGerarEscalaAdmin" class="card-custom p-6 sm:p-8 rounded-3xl space-y-4 no-print">
                 <div class="flex items-center gap-2 text-base font-bold dynamic-accent">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -334,7 +334,7 @@
         </div>
 
         <!-- CONTEUDO: HISTORICO -->
-        <div id="conteudo-historico" class="space-y-6 hidden">
+        <div id="conteudo-historico" class="space-y-6">
             <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
                 <div class="space-y-1.5 border-b border-white/10 pb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
@@ -715,7 +715,7 @@
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             
-            // Ocultar abas administrativas no modo público, mantendo apenas Escalas Salvas, Novo Repertorio e Lista de Cifras
+            // Ocultar estritamente as abas administrativas no modo público
             document.getElementById('tab-escala').classList.add('hidden');
             document.getElementById('tab-pessoas').classList.add('hidden');
             document.getElementById('tab-convidados').classList.add('hidden');
@@ -779,7 +779,6 @@
             });
         }
 
-        // Funcoes de Gestao de Cultos e Escala Ativa
         window.adicionarCultoManual = function() {
             const data = document.getElementById('dataCultoInput').value;
             const tipo = document.getElementById('tipoCultoInput').value || 'Culto';
@@ -923,7 +922,6 @@
             }
         }
 
-        // Gestao de Pessoas e Banda Fixa
         window.adicionarBandaFixa = function(e) {
             e.preventDefault();
             const instrumento = document.getElementById('instrumentoNome').value.trim();
@@ -1001,7 +999,6 @@
             }
         }
 
-        // Gestao de Repertorio e Cifras na Nuvem
         window.salvarNovaMusicaRepertorio = async function(e) {
             e.preventDefault();
             const nome = document.getElementById('repNome').value.trim();
