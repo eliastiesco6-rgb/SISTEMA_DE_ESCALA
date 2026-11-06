@@ -708,7 +708,6 @@
             document.getElementById('dataCultoInput').value = hoje;
             document.getElementById('tipoCultoInput').value = 'Culto de Domingo';
             
-            // VERIFICAR SE O LINK TEM O PARAMETRO DE MODO PUBLICO
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('modo') === 'publico') {
                 ativarModoPublicoVisualizacao();
@@ -723,13 +722,11 @@
 
         function ativarModoPublicoVisualizacao() {
             modoPublicoAtivo = true;
-            // Ocultar barras de admin e botoes de criacao
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             document.getElementById('menuAbasAdmin').classList.add('hidden');
             document.getElementById('blocoGerarEscalaAdmin').classList.add('hidden');
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
 
-            // Alterar titulos para a visao publica
             document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
             document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas, ministros e louvores programados para os cultos.";
             document.getElementById('tituloPainelEscalaAtual').innerText = "Escalas e Cultos Programados";
