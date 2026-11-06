@@ -120,11 +120,11 @@
 
     <div class="max-w-6xl mx-auto space-y-6">
         
-        <!-- BARRA SUPERIOR -->
+        <!-- BARRA SUPERIOR ADMIN -->
         <div id="barraSuperiorAdmin" class="no-print card-custom p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-sm font-bold">
             <div class="flex items-center gap-3">
                 <div class="w-3.5 h-3.5 rounded-full animate-pulse" style="background-color: var(--accent-color);"></div>
-                <span class="text-muted-custom">Estado Firebase: <span id="statusSalvar" class="text-emerald-400 font-mono">A ligar...</span></span>
+                <span class="text-muted-custom">Estado Nuvem: <span id="statusSalvar" class="text-emerald-400 font-mono">A ligar...</span></span>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
@@ -160,7 +160,7 @@
                     <i class="fa-solid fa-church"></i> Ministerio de Louvor
                 </div>
                 <h1 id="tituloPrincipalApp" class="text-3xl sm:text-5xl font-black tracking-tight">Escalas & Repertorio</h1>
-                <p id="subtituloPrincipalApp" class="text-sm sm:text-base text-muted-custom font-medium max-w-xl">Gestao profissional sincronizada em tempo real na nuvem.</p>
+                <p id="subtituloPrincipalApp" class="text-sm sm:text-base text-muted-custom font-medium max-w-xl">Gestao profissional de cultos, repertorio e escalas sincronizadas em tempo real.</p>
             </div>
             
             <div class="flex flex-wrap items-center gap-3 no-print w-full md:w-auto relative z-10">
@@ -172,7 +172,10 @@
 
         <!-- MENU DE ABAS -->
         <div id="menuAbasAdmin" class="flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
-            <button onclick="mudarAba('historico')" id="tab-historico" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
+            <button onclick="mudarAba('escala')" id="tab-escala" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
+                <i class="fa-solid fa-calendar-days"></i> Escala Ativa
+            </button>
+            <button onclick="mudarAba('historico')" id="tab-historico" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
                 <i class="fa-solid fa-folder-open"></i> Escalas Salvas
             </button>
             <button onclick="mudarAba('repertorio')" id="tab-repertorio" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
@@ -181,6 +184,64 @@
             <button onclick="mudarAba('listacifras')" id="tab-listacifras" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
                 <i class="fa-solid fa-book-open"></i> Lista de Cifras
             </button>
+            <button onclick="mudarAba('pessoas')" id="tab-pessoas" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
+                <i class="fa-solid fa-users-gear"></i> Banda e Cantores
+            </button>
+            <button onclick="mudarAba('convidados')" id="tab-convidados" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
+                <i class="fa-solid fa-star"></i> Convidados
+            </button>
+        </div>
+
+        <!-- CONTEUDO: ESCALA ATIVA -->
+        <div id="conteudo-escala" class="space-y-6">
+            <div id="blocoGerarEscalaAdmin" class="card-custom p-6 sm:p-8 rounded-3xl space-y-4 no-print">
+                <div class="flex items-center gap-2 text-base font-bold dynamic-accent">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Criar ou Gerar Nova Escala de Culto</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm font-bold text-muted-custom mb-1.5">Data do Culto</label>
+                        <input type="date" id="dataCultoInput" class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm font-bold focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-muted-custom mb-1.5">Nome / Tipo do Culto</label>
+                        <input type="text" id="tipoCultoInput" list="sugestoesCultos" placeholder="Ex: Culto de Domingo..." class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm font-bold focus:outline-none">
+                        <datalist id="sugestoesCultos">
+                            <option value="Culto de Domingo">
+                            <option value="Culto de Quinta-feira">
+                            <option value="Culto Especial / Vigilia">
+                            <option value="Ensaio Geral">
+                            <option value="Culto de Jovens">
+                            <option value="Santa Ceia">
+                        </datalist>
+                    </div>
+                    <div>
+                        <button onclick="gerarEscalaAutomatica()" class="w-full btn-glow text-sm font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-shuffle"></i> Gerar Automatica
+                        </button>
+                    </div>
+                    <div>
+                        <button onclick="adicionarCultoManual()" class="w-full btn-secondary-custom text-sm font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> Adicionar Vazio
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-custom p-6 sm:p-10 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-5">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black tracking-tight">Painel da Escala Atual</h2>
+                        <p class="text-sm text-muted-custom">Preencha e salve para enviar à nuvem da igreja.</p>
+                    </div>
+                    <button onclick="salvarEscalaAtualNaNuvem()" class="btn-glow px-6 py-3.5 rounded-2xl text-xs font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar Escala na Nuvem
+                    </button>
+                </div>
+                <div id="listaCultos" class="space-y-6"></div>
+            </div>
         </div>
 
         <!-- CONTEUDO: NOVO REPERTORIO -->
@@ -273,15 +334,103 @@
         </div>
 
         <!-- CONTEUDO: HISTORICO -->
-        <div id="conteudo-historico" class="space-y-6">
+        <div id="conteudo-historico" class="space-y-6 hidden">
             <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
                 <div class="space-y-1.5 border-b border-white/10 pb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
                         <i class="fa-solid fa-folder-open"></i> Escalas Salvas e Arquivadas na Nuvem
                     </h2>
-                    <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar todos os detalhes, ministros e louvores atualizados.</p>
+                    <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar todos os detalhes, ministros e louvores.</p>
                 </div>
                 <div id="listaHistoricoDatas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- CONTEUDO: PESSOAS E BANDA -->
+        <div id="conteudo-pessoas" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
+                    <h2 class="text-base font-bold flex items-center gap-2 dynamic-accent">
+                        <i class="fa-solid fa-guitar"></i> Banda Fixa (Instrumentos)
+                    </h2>
+                    <form onsubmit="adicionarBandaFixa(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-muted-custom mb-1.5">Instrumento / Funcao</label>
+                            <input type="text" id="instrumentoNome" placeholder="Ex: Teclado..." required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-muted-custom mb-1.5">Musico Responsavel</label>
+                            <input type="text" id="musicoNome" placeholder="Nome do Musico" required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
+                        </div>
+                        <button type="submit" class="w-full btn-glow text-sm font-bold py-4 rounded-2xl shadow-md">Adicionar a Banda Fixa</button>
+                    </form>
+                    <div class="overflow-x-auto pt-3">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-white/10 text-muted-custom">
+                                    <th class="py-3 px-2">Instrumento</th>
+                                    <th class="py-3 px-2">Musico</th>
+                                    <th class="py-3 px-2 text-center">Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaBandaFixa" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
+                    <h2 class="text-base font-bold flex items-center gap-2 dynamic-accent">
+                        <i class="fa-solid fa-microphone-lines"></i> Cantores Oficiais (Banda)
+                    </h2>
+                    <form onsubmit="adicionarCantor(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-muted-custom mb-1.5">Nome do Cantor Oficial</label>
+                            <input type="text" id="novoCantorNome" placeholder="Ex: Tati..." required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
+                        </div>
+                        <button type="submit" class="w-full btn-glow text-sm font-bold py-4 rounded-2xl shadow-md">Adicionar Cantor Oficial</button>
+                    </form>
+                    <div class="overflow-x-auto pt-3">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-white/10 text-muted-custom">
+                                    <th class="py-3 px-2">Nome</th>
+                                    <th class="py-3 px-2 text-center">Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaCantores" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTEUDO: CONVIDADOS -->
+        <div id="conteudo-convidados" class="space-y-6 hidden">
+            <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5 max-w-2xl mx-auto">
+                <div class="space-y-1.5">
+                    <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
+                        <i class="fa-solid fa-star"></i> Cantores Convidados (Oportunidades)
+                    </h2>
+                    <p class="text-sm text-muted-custom">Sistema garante que entram na escala apenas 1 vez por mes.</p>
+                </div>
+                <form onsubmit="adicionarConvidado(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-muted-custom mb-1.5">Nome do Cantor Convidado</label>
+                        <input type="text" id="novoConvidadoNome" placeholder="Ex: Nara Julia..." required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
+                    </div>
+                    <button type="submit" class="w-full btn-glow text-sm font-bold py-4 rounded-2xl shadow-md">Adicionar Cantor Convidado</button>
+                </form>
+                <div class="overflow-x-auto pt-3">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-white/10 text-muted-custom">
+                                <th class="py-3 px-2">Nome</th>
+                                <th class="py-3 px-2 text-center">Acoes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaConvidados" class="divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -468,7 +617,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE CONFIGURACAO E LOGICA DO FIREBASE (MODULAR) -->
+    <!-- SCRIPT DE CONFIGURACAO E LOGICA DO FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
@@ -492,7 +641,23 @@
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
+        let cantores = [
+            { id: '1', nome: 'Tati' },
+            { id: '2', nome: 'Ana' },
+            { id: '3', nome: 'Samuel' },
+            { id: '4', nome: 'Priscila' },
+            { id: '5', nome: 'Gabriel' }
+        ];
+
+        let convidados = [
+            { id: '1', nome: 'Nara Julia' },
+            { id: '2', nome: 'Livia' },
+            { id: '3', nome: 'Elizama' },
+            { id: '4', nome: 'Salete' }
+        ];
+
         let repertorio = [];
+        let cultos = [];
         let historicoEscalas = [];
 
         let musicaAtualEmExibicao = null;
@@ -535,6 +700,12 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('modo') === 'publico') {
                 ativarModoPublicoVisualizacao();
+            } else {
+                const hoje = new Date().toISOString().split('T')[0];
+                const inputData = document.getElementById('dataCultoInput');
+                if (inputData) inputData.value = hoje;
+                const inputTipo = document.getElementById('tipoCultoInput');
+                if (inputTipo) inputTipo.value = 'Culto de Domingo';
             }
 
             ouvirDadosFirebase();
@@ -543,8 +714,15 @@
         function ativarModoPublicoVisualizacao() {
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
+            
+            // Ocultar abas administrativas no modo público, mantendo apenas Escalas Salvas, Novo Repertorio e Lista de Cifras
+            document.getElementById('tab-escala').classList.add('hidden');
+            document.getElementById('tab-pessoas').classList.add('hidden');
+            document.getElementById('tab-convidados').classList.add('hidden');
+
             document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
-            document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas e acesse a lista de cifras atualizada em tempo real.";
+            document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas, cadastre novas musicas e acesse a lista de cifras.";
+            
             mudarAba('historico');
         }
 
@@ -566,13 +744,19 @@
 
         window.mudarAba = function(aba) {
             pararRolagem();
+            document.getElementById('conteudo-escala').classList.add('hidden');
             document.getElementById('conteudo-historico').classList.add('hidden');
             document.getElementById('conteudo-repertorio').classList.add('hidden');
             document.getElementById('conteudo-listacifras').classList.add('hidden');
+            document.getElementById('conteudo-pessoas').classList.add('hidden');
+            document.getElementById('conteudo-convidados').classList.add('hidden');
             
+            document.getElementById('tab-escala').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
             document.getElementById('tab-historico').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
             document.getElementById('tab-repertorio').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
             document.getElementById('tab-listacifras').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
+            document.getElementById('tab-pessoas').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
+            document.getElementById('tab-convidados').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
 
             document.getElementById(`conteudo-${aba}`).classList.remove('hidden');
             document.getElementById(`tab-${aba}`).className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2";
@@ -583,27 +767,241 @@
 
             onSnapshot(collection(db, "repertorio"), (snapshot) => {
                 repertorio = [];
-                snapshot.forEach((doc) => {
-                    repertorio.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach((doc) => { repertorio.push({ id: doc.id, ...doc.data() }); });
                 renderizarListaCifras();
                 if (statusEl) statusEl.innerText = "Sincronizado na nuvem";
-            }, (error) => {
-                console.error("Erro ao sincronizar repertorio:", error);
-                if (statusEl) statusEl.innerText = "Erro na sincronização";
             });
 
             onSnapshot(collection(db, "historicoEscalas"), (snapshot) => {
                 historicoEscalas = [];
-                snapshot.forEach((doc) => {
-                    historicoEscalas.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach((doc) => { historicoEscalas.push({ id: doc.id, ...doc.data() }); });
                 renderizarHistorico();
-            }, (error) => {
-                console.error("Erro ao sincronizar escalas:", error);
             });
         }
 
+        // Funcoes de Gestao de Cultos e Escala Ativa
+        window.adicionarCultoManual = function() {
+            const data = document.getElementById('dataCultoInput').value;
+            const tipo = document.getElementById('tipoCultoInput').value || 'Culto';
+            if (!data) { alert("Selecione a data do culto."); return; }
+
+            cultos.push({
+                id: 'culto_' + Date.now(),
+                data,
+                tipo,
+                momentos: [
+                    { titulo: 'Devocional / Oraçao', ministro: '', musicas: [] },
+                    { titulo: 'Louvor Inicial', ministro: '', musicas: [] },
+                    { titulo: 'Harpa Crista / Especial', ministro: '', musicas: [] }
+                ]
+            });
+            renderizarEscalaAtiva();
+        }
+
+        window.gerarEscalaAutomatica = function() {
+            const data = document.getElementById('dataCultoInput').value;
+            const tipo = document.getElementById('tipoCultoInput').value || 'Culto de Domingo';
+            if (!data) { alert("Selecione a data."); return; }
+
+            let ministroEscolhido = cantores.length > 0 ? cantores[Math.floor(Math.random() * cantores.length)].nome : 'Ministro';
+            let musicasSugeridas = repertorio.length >= 3 ? [
+                { musica: repertorio[0].nome, tom: repertorio[0].tom, ritmo: repertorio[0].ritmo, bpm: repertorio[0].bpm },
+                { musica: repertorio[1].nome, tom: repertorio[1].tom, ritmo: repertorio[1].ritmo, bpm: repertorio[1].bpm },
+                { musica: repertorio[2].nome, tom: repertorio[2].tom, ritmo: repertorio[2].ritmo, bpm: repertorio[2].bpm }
+            ] : [];
+
+            cultos.push({
+                id: 'culto_' + Date.now(),
+                data,
+                tipo,
+                momentos: [
+                    { titulo: 'Louvor Principal', ministro: ministroEscolhido, musicas: musicasSugeridas }
+                ]
+            });
+            renderizarEscalaAtiva();
+        }
+
+        window.renderizarEscalaAtiva = function() {
+            const container = document.getElementById('listaCultos');
+            if (!container) return;
+            if (cultos.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-muted-custom italic text-sm">Nenhum culto adicionado no painel atual.</div>`;
+                return;
+            }
+
+            container.innerHTML = cultos.map((culto, cIdx) => `
+                <div class="sub-card p-5 sm:p-6 rounded-2xl space-y-4 border">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-black uppercase px-3 py-1 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span>
+                            <span class="text-xs font-mono text-muted-custom">${culto.data}</span>
+                        </div>
+                        <button onclick="removerCultoAtivo(${cIdx})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash-can"></i> Remover Culto</button>
+                    </div>
+
+                    <div id="momentosCulto_${cIdx}" class="space-y-3">
+                        ${(culto.momentos || []).map((m, mIdx) => `
+                            <div class="card-custom p-4 rounded-xl space-y-3 border border-white/5">
+                                <div class="flex flex-wrap justify-between items-center gap-2">
+                                    <input type="text" value="${m.titulo}" onchange="atualizarTituloMomento(${cIdx}, ${mIdx}, this.value)" class="input-custom px-3 py-1.5 rounded-lg text-xs font-bold w-48">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-muted-custom">Ministro:</span>
+                                        <select onchange="atualizarMinistroMomento(${cIdx}, ${mIdx}, this.value)" class="input-custom px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">
+                                            <option value="">Selecionar...</option>
+                                            ${cantores.map(cantor => `<option value="${cantor.nome}" ${m.ministro === cantor.nome ? 'selected' : ''}>${cantor.nome}</option>`).join('')}
+                                            ${convidados.map(conv => `<option value="${conv.nome}" ${m.ministro === conv.nome ? 'selected' : ''}>${conv.nome} (Convidado)</option>`).join('')}
+                                        </select>
+                                        <button onclick="adicionarMusicaMomento(${cIdx}, ${mIdx})" class="btn-secondary-custom px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Musica</button>
+                                        <button onclick="removerMomento(${cIdx}, ${mIdx})" class="text-rose-400 hover:text-rose-300 px-2 py-1 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2 pt-1">
+                                    ${(m.musicas || []).map((mus, musIdx) => `
+                                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-black/30 p-2 rounded-lg border border-white/5">
+                                            <div class="sm:col-span-5">
+                                                <select onchange="selecionarMusicaRepertorioNaEscala(${cIdx}, ${mIdx}, ${musIdx}, this.value)" class="w-full input-custom px-2.5 py-1.5 rounded-lg text-xs">
+                                                    <option value="">Selecione do repertorio...</option>
+                                                    ${repertorio.map(r => `<option value="${r.nome}" ${mus.musica === r.nome ? 'selected' : ''}>${r.nome} (${r.artista})</option>`).join('')}
+                                                </select>
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <input type="text" value="${mus.tom || ''}" placeholder="Tom" onchange="atualizarCampoMusica(${cIdx}, ${mIdx}, ${musIdx}, 'tom', this.value)" class="w-full input-custom px-2.5 py-1.5 rounded-lg text-xs text-center font-bold">
+                                            </div>
+                                            <div class="sm:col-span-3">
+                                                <input type="text" value="${mus.ritmo || ''}" placeholder="Ritmo" onchange="atualizarCampoMusica(${cIdx}, ${mIdx}, ${musIdx}, 'ritmo', this.value)" class="w-full input-custom px-2.5 py-1.5 rounded-lg text-xs">
+                                            </div>
+                                            <div class="sm:col-span-1 text-center">
+                                                <button onclick="removerMusicaMomento(${cIdx}, ${mIdx}, ${musIdx})" class="text-rose-400 hover:text-rose-300 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button onclick="adicionarMomentoCulto(${cIdx})" class="btn-secondary-custom w-full py-2.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-plus mr-1"></i> Adicionar Momento ao Culto</button>
+                </div>
+            `).join('');
+        }
+
+        window.removerCultoAtivo = function(idx) { cultos.splice(idx, 1); renderizarEscalaAtiva(); }
+        window.adicionarMomentoCulto = function(cIdx) { cultos[cIdx].momentos.push({ titulo: 'Novo Momento', ministro: '', musicas: [] }); renderizarEscalaAtiva(); }
+        window.removerMomento = function(cIdx, mIdx) { cultos[cIdx].momentos.splice(mIdx, 1); renderizarEscalaAtiva(); }
+        window.atualizarTituloMomento = function(cIdx, mIdx, val) { cultos[cIdx].momentos[mIdx].titulo = val; }
+        window.atualizarMinistroMomento = function(cIdx, mIdx, val) { cultos[cIdx].momentos[mIdx].ministro = val; }
+        window.adicionarMusicaMomento = function(cIdx, mIdx) { cultos[cIdx].momentos[mIdx].musicas.push({ musica: '', tom: '', ritmo: '', bpm: '' }); renderizarEscalaAtiva(); }
+        window.removerMusicaMomento = function(cIdx, mIdx, musIdx) { cultos[cIdx].momentos[mIdx].musicas.splice(musIdx, 1); renderizarEscalaAtiva(); }
+        window.atualizarCampoMusica = function(cIdx, mIdx, musIdx, campo, val) { cultos[cIdx].momentos[mIdx].musicas[musIdx][campo] = val; }
+        window.selecionarMusicaRepertorioNaEscala = function(cIdx, mIdx, musIdx, nomeMusica) {
+            const achada = repertorio.find(r => r.nome === nomeMusica);
+            if (achada) {
+                cultos[cIdx].momentos[mIdx].musicas[musIdx] = {
+                    musica: achada.nome,
+                    tom: achada.tom,
+                    ritmo: achada.ritmo || '',
+                    bpm: achada.bpm || ''
+                };
+                renderizarEscalaAtiva();
+            }
+        }
+
+        window.salvarEscalaAtualNaNuvem = async function() {
+            if (cultos.length === 0) { alert("Adicione pelo menos um culto antes de salvar."); return; }
+            const tituloResumo = `Escala de Louvor (${cultos[0].data.split('-').reverse().join('/')})`;
+            const novaEscala = {
+                tituloResumo,
+                dataCriacao: new Date().toLocaleDateString('pt-BR'),
+                cultos: JSON.parse(JSON.stringify(cultos))
+            };
+
+            try {
+                await addDoc(collection(db, "historicoEscalas"), novaEscala);
+                alert("Escala guardada na nuvem com sucesso!");
+                mudarAba('historico');
+            } catch (error) {
+                alert("Erro ao salvar escala na nuvem: " + error.message);
+            }
+        }
+
+        // Gestao de Pessoas e Banda Fixa
+        window.adicionarBandaFixa = function(e) {
+            e.preventDefault();
+            const instrumento = document.getElementById('instrumentoNome').value.trim();
+            const musico = document.getElementById('musicoNome').value.trim();
+            if (!instrumento || !musico) return;
+            bandaFixa.push({ id: Date.now().toString(), instrumento, musico });
+            document.getElementById('instrumentoNome').value = '';
+            document.getElementById('musicoNome').value = '';
+            atualizarTabelasPessoas();
+        }
+
+        window.removerBandaFixa = function(id) {
+            bandaFixa = bandaFixa.filter(b => b.id !== id);
+            atualizarTabelasPessoas();
+        }
+
+        window.adicionarCantor = function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('novoCantorNome').value.trim();
+            if (!nome) return;
+            cantores.push({ id: Date.now().toString(), nome });
+            document.getElementById('novoCantorNome').value = '';
+            atualizarTabelasPessoas();
+        }
+
+        window.removerCantor = function(id) {
+            cantores = cantores.filter(c => c.id !== id);
+            atualizarTabelasPessoas();
+        }
+
+        window.adicionarConvidado = function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('novoConvidadoNome').value.trim();
+            if (!nome) return;
+            convidados.push({ id: Date.now().toString(), nome });
+            document.getElementById('novoConvidadoNome').value = '';
+            atualizarTabelasPessoas();
+        }
+
+        window.removerConvidado = function(id) {
+            convidados = convidados.filter(c => c.id !== id);
+            atualizarTabelasPessoas();
+        }
+
+        function atualizarTabelasPessoas() {
+            const tbBanda = document.getElementById('tabelaBandaFixa');
+            if (tbBanda) {
+                tbBanda.innerHTML = bandaFixa.map(b => `
+                    <tr>
+                        <td class="py-3.5 px-2 font-bold">${b.instrumento}</td>
+                        <td class="py-3.5 px-2 text-muted-custom">${b.musico}</td>
+                        <td class="py-3.5 px-2 text-center"><button onclick="removerBandaFixa('${b.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                `).join('');
+            }
+
+            const tbCantores = document.getElementById('tabelaCantores');
+            if (tbCantores) {
+                tbCantores.innerHTML = cantores.map(c => `
+                    <tr>
+                        <td class="py-3.5 px-2 font-bold">${c.nome}</td>
+                        <td class="py-3.5 px-2 text-center"><button onclick="removerCantor('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                `).join('');
+            }
+
+            const tbConvidados = document.getElementById('tabelaConvidados');
+            if (tbConvidados) {
+                tbConvidados.innerHTML = convidados.map(c => `
+                    <tr>
+                        <td class="py-3.5 px-2 font-bold">${c.nome}</td>
+                        <td class="py-3.5 px-2 text-center"><button onclick="removerConvidado('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Gestao de Repertorio e Cifras na Nuvem
         window.salvarNovaMusicaRepertorio = async function(e) {
             e.preventDefault();
             const nome = document.getElementById('repNome').value.trim();
@@ -617,10 +1015,8 @@
 
             if (!nome || !artista || !tom) return;
 
-            const novaMusica = { nome, artista, tom, capotraste, ritmo, bpm, youtube, cifra };
-
             try {
-                await addDoc(collection(db, "repertorio"), novaMusica);
+                await addDoc(collection(db, "repertorio"), { nome, artista, tom, capotraste, ritmo, bpm, youtube, cifra });
                 document.getElementById('repNome').value = '';
                 document.getElementById('repArtista').value = '';
                 document.getElementById('repTom').value = '';
@@ -631,14 +1027,13 @@
                 alert("Musica salva na nuvem com sucesso!");
                 mudarAba('listacifras');
             } catch (error) {
-                alert("Erro ao salvar no Firebase: " + error.message);
+                alert("Erro ao salvar: " + error.message);
             }
         }
 
         window.abrirModalEditarCifra = function(id) {
             const musica = repertorio.find(r => r.id === id);
             if (!musica) return;
-
             document.getElementById('editId').value = musica.id;
             document.getElementById('editNome').value = musica.nome;
             document.getElementById('editArtista').value = musica.artista;
@@ -648,19 +1043,15 @@
             document.getElementById('editBpm').value = musica.bpm || '';
             document.getElementById('editYoutube').value = musica.youtube || '';
             document.getElementById('editCifra').value = musica.cifra || '';
-
             document.getElementById('modalEditarCifra').classList.remove('hidden');
         }
 
-        window.fecharModalEditarCifra = function() {
-            document.getElementById('modalEditarCifra').classList.add('hidden');
-        }
+        window.fecharModalEditarCifra = function() { document.getElementById('modalEditarCifra').classList.add('hidden'); }
 
         window.salvarEdicaoCifra = async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            
-            const musicaAtualizada = {
+            const dadosAtualizados = {
                 nome: document.getElementById('editNome').value.trim(),
                 artista: document.getElementById('editArtista').value.trim(),
                 tom: document.getElementById('editTom').value.trim(),
@@ -672,9 +1063,9 @@
             };
 
             try {
-                await updateDoc(doc(db, "repertorio", id), musicaAtualizada);
+                await updateDoc(doc(db, "repertorio", id), dadosAtualizados);
                 fecharModalEditarCifra();
-                alert("Música atualizada na nuvem com sucesso!");
+                alert("Musica atualizada na nuvem!");
             } catch (error) {
                 alert("Erro ao atualizar: " + error.message);
             }
@@ -682,102 +1073,49 @@
 
         window.apagarMusicaRepertorio = async function(id) {
             if (confirm("Deseja apagar esta musica da nuvem?")) {
-                try {
-                    await deleteDoc(doc(db, "repertorio", id));
-                } catch (error) {
-                    alert("Erro ao apagar: " + error.message);
-                }
+                try { await deleteDoc(doc(db, "repertorio", id)); } catch (e) { alert("Erro ao apagar."); }
             }
         }
 
         window.verCifraModal = function(id) {
             const musica = repertorio.find(r => r.id === id);
             if (!musica) return;
-
             musicaAtualEmExibicao = musica;
             tomAtualTransposicao = 0;
             capoAtualModal = musica.capotraste !== undefined ? musica.capotraste : 0;
             document.getElementById('selectModalCapo').value = capoAtualModal;
-
             atualizarExibicaoModalCifra();
             document.getElementById('modalVisualizarCifra').classList.remove('hidden');
         }
 
-        window.fecharModalCifra = function() {
-            pararRolagem();
-            document.getElementById('modalVisualizarCifra').classList.add('hidden');
-        }
-
-        window.mudarCapotrasteModal = function(valor) {
-            capoAtualModal = parseInt(valor);
-            atualizarExibicaoModalCifra();
-        }
+        window.fecharModalCifra = function() { pararRolagem(); document.getElementById('modalVisualizarCifra').classList.add('hidden'); }
+        window.mudarCapotrasteModal = function(val) { capoAtualModal = parseInt(val); atualizarExibicaoModalCifra(); }
 
         function atualizarExibicaoModalCifra() {
             if (!musicaAtualEmExibicao) return;
-
             let tomBase = musicaAtualEmExibicao.tom || 'C';
             let tomRealCalculado = transporNotaStr(tomBase, capoAtualModal + tomAtualTransposicao);
-
             document.getElementById('modalNomeMusica').innerText = musicaAtualEmExibicao.nome;
             document.getElementById('modalArtistaMusica').innerText = `por ${musicaAtualEmExibicao.artista}`;
-            
-            let badgeTomText = `Tom: ${tomRealCalculado}`;
-            if (capoAtualModal > 0) {
-                let formaFormatada = transporNotaStr(tomBase, tomAtualTransposicao);
-                badgeTomText += ` (com forma de ${formaFormatada})`;
-            }
-            document.getElementById('modalTomBadge').innerText = badgeTomText;
-
-            const capoBadge = document.getElementById('modalCapoBadge');
-            if (capoAtualModal > 0) {
-                capoBadge.innerText = `Capotraste: ${capoAtualModal}ª casa`;
-                capoBadge.classList.remove('hidden');
-            } else {
-                capoBadge.classList.add('hidden');
-            }
-
+            document.getElementById('modalTomBadge').innerText = `Tom: ${tomRealCalculado}`;
             document.getElementById('displayTomAtual').innerText = tomRealCalculado;
 
-            const secaoBatidas = document.getElementById('secaoBatidas');
-            if (musicaAtualEmExibicao.ritmo || musicaAtualEmExibicao.bpm) {
-                secaoBatidas.classList.remove('hidden');
-                document.getElementById('modalBpmDisplay').innerText = musicaAtualEmExibicao.bpm ? `• ${musicaAtualEmExibicao.bpm} bpm` : '';
-                document.getElementById('modalBatidaSetas').innerText = musicaAtualEmExibicao.ritmo || '↓  ↓↑  ↓  ↑';
-            } else {
-                secaoBatidas.classList.add('hidden');
-            }
-
-            const ytContainer = document.getElementById('modalYoutubeContainer');
-            const ytLink = document.getElementById('modalLinkYoutube');
-            if (musicaAtualEmExibicao.youtube) {
-                ytLink.href = musicaAtualEmExibicao.youtube;
-                ytContainer.classList.remove('hidden');
-            } else {
-                ytContainer.classList.add('hidden');
-            }
-
-            let cifraProcessada = transporTextoCifra(musicaAtualEmExibicao.cifra || 'Nenhuma cifra cadastrada.', tomAtualTransposicao);
-            document.getElementById('modalTextoCifra').innerHTML = formatarCifraHTML(cifraProcessada);
-            gerarDiagramasAcordes(cifraProcessada);
+            const cifraProc = transporTextoCifra(musicaAtualEmExibicao.cifra || '', tomAtualTransposicao);
+            document.getElementById('modalTextoCifra').innerHTML = formatarCifraHTML(cifraProc);
+            gerarDiagramasAcordes(cifraProc);
         }
 
         function transporNotaStr(nota, semitons) {
             if (!nota) return '';
             let limpa = nota.trim();
             let raiz = limpa.charAt(0).toUpperCase();
-            if (limpa.length > 1 && (limpa.charAt(1) === '#' || limpa.charAt(1) === 'b')) {
-                raiz += limpa.charAt(1);
-            }
+            if (limpa.length > 1 && (limpa.charAt(1) === '#' || limpa.charAt(1) === 'b')) raiz += limpa.charAt(1);
             let resto = limpa.substring(raiz.length);
-
             let idx = escalaNotas.indexOf(raiz);
             if (idx === -1) idx = escalaBemol.indexOf(raiz);
             if (idx === -1) return nota;
-
             let novoIdx = (idx + semitons) % 12;
             if (novoIdx < 0) novoIdx += 12;
-
             return escalaNotas[novoIdx] + resto;
         }
 
@@ -793,124 +1131,62 @@
             });
         }
 
-        window.transporTom = function(delta) {
-            tomAtualTransposicao += delta;
-            atualizarExibicaoModalCifra();
-        }
+        window.transporTom = function(delta) { tomAtualTransposicao += delta; atualizarExibicaoModalCifra(); }
 
         function formatarCifraHTML(texto) {
-            let linhas = texto.split('\n');
-            let htmlFinal = linhas.map(linha => {
+            return texto.split('\n').map(linha => {
                 let eAcorde = /^\s*([A-G][#b]?[m]?[0-9]?\s*)+$/.test(linha);
-                if (eAcorde) {
-                    return linha.replace(/([A-G][#b]?[m]?[0-9]?)/g, '<span class="chord">$1</span>');
-                }
+                if (eAcorde) return linha.replace(/([A-G][#b]?[m]?[0-9]?)/g, '<span class="chord">$1</span>');
                 return linha.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             }).join('\n');
-            return htmlFinal;
         }
 
         function gerarDiagramasAcordes(texto) {
             const container = document.getElementById('containerDiagramas');
             const matches = texto.match(/([A-G][#b]?[m]?[0-9]?)/g);
-            if (!matches) {
-                container.innerHTML = `<span class="text-xs text-muted-custom italic">Nenhum acorde detectado.</span>`;
-                return;
-            }
-
+            if (!matches) { container.innerHTML = `<span class="text-xs text-muted-custom italic">Nenhum acorde detectado.</span>`; return; }
             let unicos = [...new Set(matches)].slice(0, 6);
-            let htmlDiagramas = '';
-
-            unicos.forEach(acorde => {
+            container.innerHTML = unicos.map(acorde => {
                 let diag = dicionarioDiagramas[acorde] || dicionarioDiagramas['C'];
-                htmlDiagramas += `
-                    <div class="bg-black/40 p-2.5 rounded-xl border border-white/10 flex flex-col items-center gap-1">
-                        <span class="font-bold text-xs dynamic-accent">${acorde}</span>
-                        <div class="font-mono text-[9px] text-muted-custom tracking-tighter bg-black/60 px-2 py-1 rounded">
-                            Trastes: ${diag.trastes.join(' ')}
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = htmlDiagramas;
+                return `<div class="bg-black/40 p-2.5 rounded-xl border border-white/10 flex flex-col items-center gap-1"><span class="font-bold text-xs dynamic-accent">${acorde}</span><div class="font-mono text-[9px] text-muted-custom tracking-tighter bg-black/60 px-2 py-1 rounded">Trastes: ${diag.trastes.join(' ')}</div></div>`;
+            }).join('');
         }
 
-        window.toggleRolagem = function() {
-            if (rolandoAtivo) { pararRolagem(); } else { iniciarRolagem(); }
-        }
-
+        window.toggleRolagem = function() { if (rolandoAtivo) pararRolagem(); else iniciarRolagem(); }
         function iniciarRolagem() {
-            if (velocidadeRolagem <= 0) return;
             rolandoAtivo = true;
             document.getElementById('textoBtnRolagem').innerText = "Pausar";
-            document.getElementById('iconePlayRolagem').className = "fa-solid fa-pause text-xs";
-
             const corpo = document.getElementById('corpoModalCifra');
-            acumuloPixelRolagem = 0;
-            
             esporadicoIntervalRolagem = setInterval(() => {
-                acumuloPixelRolagem += velocidadeRolagem * 0.4;
-                if (acumuloPixelRolagem >= 1) {
-                    let pixelsParaMover = Math.floor(acumuloPixelRolagem);
-                    corpo.scrollTop += pixelsParaMover;
-                    acumuloPixelRolagem -= pixelsParaMover;
-                }
-                if (corpo.scrollTop + corpo.clientHeight >= corpo.scrollHeight - 2) {
-                    pararRolagem();
-                }
-            }, 30);
+                corpo.scrollTop += 1;
+                if (corpo.scrollTop + corpo.clientHeight >= corpo.scrollHeight - 2) pararRolagem();
+            }, 50);
         }
-
         function pararRolagem() {
             rolandoAtivo = false;
             document.getElementById('textoBtnRolagem').innerText = "Iniciar";
-            document.getElementById('iconePlayRolagem').className = "fa-solid fa-play text-xs";
-            if (esporadicoIntervalRolagem) {
-                clearInterval(esporadicoIntervalRolagem);
-                esporadicoIntervalRolagem = null;
-            }
+            if (esporadicoIntervalRolagem) clearInterval(esporadicoIntervalRolagem);
         }
-
-        window.ajustarVelocidadeRolagem = function(delta) {
-            velocidadeRolagem = Math.max(0.1, Math.min(5.0, Number((velocidadeRolagem + delta).toFixed(1))));
-            document.getElementById('displayVelocidade').innerText = velocidadeRolagem.toFixed(1) + 'x';
-        }
+        window.ajustarVelocidadeRolagem = function(d) {}
 
         function renderizarListaCifras() {
             const container = document.getElementById('tabelaListaCifras');
             if (!container) return;
             const termo = document.getElementById('inputPesquisaRepertorio').value.toLowerCase();
-
-            const filtradas = repertorio.filter(r => 
-                r.nome.toLowerCase().includes(termo) || r.artista.toLowerCase().includes(termo)
-            );
-
-            if (filtradas.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma musica encontrada na nuvem.</div>`;
-                return;
-            }
-
+            const filtradas = repertorio.filter(r => r.nome.toLowerCase().includes(termo) || r.artista.toLowerCase().includes(termo));
+            if (filtradas.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma musica encontrada.</div>`; return; }
             container.innerHTML = filtradas.map(r => `
                 <div class="sub-card p-5 rounded-2xl flex flex-col justify-between gap-4 border">
                     <div class="space-y-1">
                         <div class="flex justify-between items-start">
                             <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg border font-mono" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">Tom: ${r.tom} ${r.capotraste ? `(Capo ${r.capotraste}ª)` : ''}</span>
-                            ${!modoPublicoAtivo ? `
-                            <div class="flex items-center gap-1">
-                                <button onclick="abrirModalEditarCifra('${r.id}')" class="text-amber-400 hover:text-amber-300 text-xs p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="apagarMusicaRepertorio('${r.id}')" class="text-rose-400 hover:text-rose-300 text-xs p-1" title="Apagar"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>` : ''}
+                            ${!modoPublicoAtivo ? `<div class="flex items-center gap-1"><button onclick="abrirModalEditarCifra('${r.id}')" class="text-amber-400 text-xs p-1"><i class="fa-solid fa-pen"></i></button><button onclick="apagarMusicaRepertorio('${r.id}')" class="text-rose-400 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button></div>` : ''}
                         </div>
                         <h3 class="text-base font-bold pt-1">${r.nome}</h3>
-                        <p class="text-xs text-muted-custom">${r.artista} ${r.bpm ? `• ${r.bpm} bpm` : ''}</p>
+                        <p class="text-xs text-muted-custom">${r.artista}</p>
                     </div>
-
                     <div class="pt-2 border-t border-white/5 flex items-center justify-between">
-                        <button onclick="verCifraModal('${r.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-1.5">
-                            <i class="fa-solid fa-book-open-reader"></i> Ver Cifra
-                        </button>
-                        ${r.youtube ? `<a href="${r.youtube}" target="_blank" class="text-rose-400 hover:text-rose-300 text-xs font-bold flex items-center gap-1"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                        <button onclick="verCifraModal('${r.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold"><i class="fa-solid fa-book-open-reader mr-1"></i> Ver Cifra</button>
                     </div>
                 </div>
             `).join('');
@@ -922,52 +1198,38 @@
             document.getElementById('modalEscalaTitulo').innerText = hist.tituloResumo;
             document.getElementById('modalEscalaDataCriacao').innerText = `Salvo em: ${hist.dataCriacao}`;
             const containerConteudo = document.getElementById('modalEscalaConteudo');
-            
-            let htmlEscala = hist.cultos.map(culto => {
-                const [ano, mes, dia] = culto.data.split('-');
-                const dataFormatada = `${dia}/${mes}/${ano}`;
-                const bandaHtml = bandaFixa.map(b => `<span class="sub-card border text-xs px-3 py-1.5 rounded-xl font-medium inline-flex items-center gap-1.5"><strong class="dynamic-accent">${b.instrumento}:</strong> ${b.musico}</span>`).join('');
-                const momentosHtml = (culto.momentos || []).map(m => {
-                    const musicasHtml = (m.musicas || []).map(mus => `<div class="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-1 text-xs items-center border-b border-white/5 pb-2"><div class="sm:col-span-2 font-bold">${mus.musica || 'Musica nao informada'}</div><div><span class="text-muted-custom">Tom:</span> <span class="font-bold dynamic-accent">${mus.tom || '-'}</span></div><div><span class="text-muted-custom">Ritmo:</span> ${mus.ritmo || '-'}</div><div><span class="text-muted-custom">BPM:</span> ${mus.bpm || '-'}</div></div>`).join('');
-                    return `<div class="sub-card p-4 rounded-2xl space-y-2 border border-white/5"><div class="flex justify-between items-center border-b border-white/5 pb-2"><span class="text-xs font-black uppercase dynamic-accent tracking-wider">${m.titulo}</span><span class="text-xs font-bold text-slate-300">Ministro: ${m.ministro || 'Nao definido'}</span></div><div class="space-y-1 pt-1">${musicasHtml}</div></div>`;
-                }).join('');
-                return `<div class="sub-card p-5 rounded-2xl space-y-4 border border-white/10"><div class="flex justify-between items-center border-b border-white/10 pb-3"><span class="text-xs font-black uppercase px-3 py-1 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span><span class="text-xs font-mono text-muted-custom">${dataFormatada}</span></div><div><span class="text-xs font-bold text-muted-custom uppercase tracking-wider block mb-2">Banda Fixa:</span><div class="flex flex-wrap gap-2">${bandaHtml}</div></div><div class="space-y-2.5"><span class="text-xs font-bold text-muted-custom uppercase tracking-wider block">Momentos:</span>${momentosHtml}</div></div>`;
-            }).join('');
-
-            containerConteudo.innerHTML = htmlEscala;
+            containerConteudo.innerHTML = hist.cultos.map(culto => `
+                <div class="sub-card p-5 rounded-2xl space-y-4 border border-white/10">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                        <span class="text-xs font-black uppercase px-3 py-1 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span>
+                        <span class="text-xs font-mono text-muted-custom">${culto.data}</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        ${(culto.momentos || []).map(m => `
+                            <div class="sub-card p-3 rounded-xl border border-white/5">
+                                <span class="text-xs font-bold dynamic-accent uppercase block">${m.titulo} (Ministro: ${m.ministro || 'Nao definido'})</span>
+                                ${(m.musicas || []).map(mus => `<div class="text-xs pt-1">• <strong>${mus.musica}</strong> (Tom: ${mus.tom})</div>`).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
             document.getElementById('modalVisualizarEscala').classList.remove('hidden');
         }
 
         window.fecharModalEscala = function() { document.getElementById('modalVisualizarEscala').classList.add('hidden'); }
-
-        window.apagarHistorico = async function(id) {
-            if (confirm("Deseja apagar esta escala da nuvem?")) {
-                try {
-                    await deleteDoc(doc(db, "historicoEscalas", id));
-                } catch (error) {
-                    alert("Erro ao apagar escala: " + error.message);
-                }
-            }
-        }
+        window.apagarHistorico = async function(id) { if (confirm("Apagar escala da nuvem?")) await deleteDoc(doc(db, "historicoEscalas", id)); }
 
         function renderizarHistorico() {
             const container = document.getElementById('listaHistoricoDatas');
             if (!container) return;
-            if (historicoEscalas.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma escala salva na nuvem no momento.</div>`;
-                return;
-            }
+            if (historicoEscalas.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma escala salva na nuvem.</div>`; return; }
             container.innerHTML = historicoEscalas.map(hist => `
                 <div class="sub-card p-5 rounded-2xl flex flex-col justify-between gap-4 border">
-                    <div class="space-y-1.5">
-                        <span class="text-xs font-mono text-muted-custom">Salvo em: ${hist.dataCriacao}</span>
-                        <h3 class="text-sm font-bold dynamic-accent">${hist.tituloResumo}</h3>
-                    </div>
+                    <div class="space-y-1.5"><span class="text-xs font-mono text-muted-custom">${hist.dataCriacao}</span><h3 class="text-sm font-bold dynamic-accent">${hist.tituloResumo}</h3></div>
                     <div class="flex justify-between items-center pt-3 border-t border-white/5">
-                        <div class="flex items-center gap-2">
-                            <button onclick="verEscalaModal('${hist.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-1.5"><i class="fa-solid fa-eye"></i> Ver Escala</button>
-                        </div>
-                        ${!modoPublicoAtivo ? `<button onclick="apagarHistorico('${hist.id}')" class="text-rose-400 hover:text-rose-300 text-sm px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                        <button onclick="verEscalaModal('${hist.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold"><i class="fa-solid fa-eye mr-1"></i> Ver Escala</button>
+                        ${!modoPublicoAtivo ? `<button onclick="apagarHistorico('${hist.id}')" class="text-rose-400 text-sm p-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>
             `).join('');
