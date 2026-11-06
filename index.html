@@ -115,6 +115,33 @@
             .card-custom { background: white !important; border: 1px solid #ccc !important; color: black !important; box-shadow: none !important; }
         }
     </style>
+
+    <!-- FIREBASE SDK MODULAR VIA CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt60CWl-466Fxcmr9WSK0anEu5NbXzas8",
+            authDomain: "escalas-igreja-e4f0f.firebaseapp.com",
+            projectId: "escalas-igreja-e4f0f",
+            storageBucket: "escalas-igreja-e4f0f.firebasestorage.app",
+            messagingSenderId: "10919774959",
+            appId: "1:10919774959:web:a63fd53ee1f4db1cfa33cf"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firebaseDoc = doc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseOnSnapshot = onSnapshot;
+        window.firebaseReady = true;
+
+        // Disparar evento quando o Firebase estiver pronto para carregar os dados da nuvem
+        window.dispatchEvent(new Event('firebase-loaded'));
+    </script>
 </head>
 <body class="theme-bg-preto min-h-screen font-sans p-4 sm:p-8 transition-colors duration-300 text-sm">
 
@@ -699,6 +726,69 @@
             'A#': { trastes: ['x', '1', '3', '3', '3', '1'] }
         };
 
+        // --- SINCRONIZAÇÃO COM O FIREBASE FIRESTORE ---
+        async function salvarTudo() {
+            // Salva no localStorage (cache local imediato)
+            localStorage.setItem('igreja_banda_v28', JSON.stringify(bandaFixa));
+            localStorage.setItem('igreja_cantores_v28', JSON.stringify(cantores));
+            localStorage.setItem('igreja_convidados_v28', JSON.stringify(convidados));
+            localStorage.setItem('igreja_repertorio_v28', JSON.stringify(repertorio));
+            localStorage.setItem('igreja_cultos_v28', JSON.stringify(cultos));
+            localStorage.setItem('igreja_historico_v28', JSON.stringify(historicoEscalas));
+            localStorage.setItem('igreja_escala_ativa_titulo_v28', escalaAtivaTitulo || '');
+            
+            const status = document.getElementById('statusSalvar');
+            if (status) {
+                status.innerText = "A guardar na nuvem...";
+                status.className = "text-amber-400 font-mono";
+            }
+
+            // Salva no Firestore (Nuvem) para atualizar o link público em tempo real
+            if (window.firebaseReady && window.db) {
+                try {
+                    const dadosCloud = { bandaFixa, cantores, convidados, repertorio, cultos, historicoEscalas, escalaAtivaTitulo };
+                    await window.firebaseSetDoc(window.firebaseDoc(window.db, "sistema", "dados_igreja"), dadosCloud);
+                    if (status) {
+                        status.innerText = "Dados guardados na nuvem!";
+                        status.className = "text-emerald-400 font-mono";
+                        setTimeout(() => { status.innerText = "Dados guardados"; }, 2000);
+                    }
+                } catch (err) {
+                    console.error("Erro ao salvar no Firestore:", err);
+                    if (status) {
+                        status.innerText = "Erro ao sincronizar nuvem";
+                        status.className = "text-rose-400 font-mono";
+                    }
+                }
+            }
+        }
+
+        // Ouvir atualizações da nuvem automaticamente (Real-time sync)
+        window.addEventListener('firebase-loaded', () => {
+            if (window.db && window.firebaseDoc && window.firebaseOnSnapshot) {
+                const docRef = window.firebaseDoc(window.db, "sistema", "dados_igreja");
+                window.firebaseOnSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const dados = docSnap.data();
+                        if (dados.bandaFixa) bandaFixa = dados.bandaFixa;
+                        if (dados.cantores) cantores = dados.cantores;
+                        if (dados.convidados) convidados = dados.convidados;
+                        if (dados.repertorio) repertorio = dados.repertorio;
+                        if (dados.cultos) cultos = dados.cultos;
+                        if (dados.historicoEscalas) historicoEscalas = dados.historicoEscalas;
+                        if (dados.escalaAtivaTitulo !== undefined) escalaAtivaTitulo = dados.escalaAtivaTitulo;
+
+                        // Atualiza a interface em tempo real
+                        atualizarTabelasPessoas();
+                        renderizarHistorico();
+                        renderizarListaCifras();
+                        atualizarBalaoEscala();
+                    }
+                });
+            }
+        });
+        // ---------------------------------------------
+
         window.onload = function() {
             const savedBg = localStorage.getItem('igreja_theme_bg_v28') || 'preto';
             mudarFundo(savedBg);
@@ -723,7 +813,6 @@
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             
-            // Ocultar abas de administracao e deixar visiveis apenas: Escalas Salvas, Novo Repertorio e Lista de Cifras
             document.getElementById('tab-escala').classList.add('hidden');
             document.getElementById('tab-pessoas').classList.add('hidden');
             document.getElementById('tab-convidados').classList.add('hidden');
@@ -731,7 +820,6 @@
             document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
             document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas, cadastre novas musicas e acesse a lista de cifras.";
             
-            // Abrir diretamente na aba de Escalas Salvas
             mudarAba('historico');
         }
 
@@ -769,23 +857,6 @@
 
             document.getElementById(`conteudo-${aba}`).classList.remove('hidden');
             document.getElementById(`tab-${aba}`).className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2";
-        }
-
-        function salvarTudo() {
-            localStorage.setItem('igreja_banda_v28', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_cantores_v28', JSON.stringify(cantores));
-            localStorage.setItem('igreja_convidados_v28', JSON.stringify(convidados));
-            localStorage.setItem('igreja_repertorio_v28', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_cultos_v28', JSON.stringify(cultos));
-            localStorage.setItem('igreja_historico_v28', JSON.stringify(historicoEscalas));
-            localStorage.setItem('igreja_escala_ativa_titulo_v28', escalaAtivaTitulo || '');
-            
-            const status = document.getElementById('statusSalvar');
-            if (status) {
-                status.innerText = "Dados guardados!";
-                status.className = "text-emerald-400 font-mono";
-                setTimeout(() => { status.innerText = "Dados guardados"; }, 2000);
-            }
         }
 
         function atualizarBalaoEscala() {
