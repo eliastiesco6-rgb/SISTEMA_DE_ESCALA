@@ -289,13 +289,13 @@
                             <label class="block text-sm font-bold text-muted-custom mb-1.5">Capotraste (Casa)</label>
                             <select id="repCapotraste" class="w-full input-custom rounded-xl px-4 py-3 text-sm cursor-pointer">
                                 <option value="0">Sem capotraste</option>
-                                <option value="1">1ª casa</option>
-                                <option value="2">2ª casa</option>
-                                <option value="3">3ª casa</option>
-                                <option value="4">4ª casa</option>
-                                <option value="5">5ª casa</option>
-                                <option value="6">6ª casa</option>
-                                <option value="7">7ª casa</option>
+                                <option value="1">1Âª casa</option>
+                                <option value="2">2Âª casa</option>
+                                <option value="3">3Âª casa</option>
+                                <option value="4">4Âª casa</option>
+                                <option value="5">5Âª casa</option>
+                                <option value="6">6Âª casa</option>
+                                <option value="7">7Âª casa</option>
                             </select>
                         </div>
                         <div>
@@ -306,7 +306,7 @@
 
                     <div>
                         <label class="block text-sm font-bold text-muted-custom mb-1.5">Ritmo / Batida</label>
-                        <input type="text" id="repRitmo" placeholder="Ex: ?  ??  ?  ?" class="w-full input-custom rounded-xl px-4 py-3 text-sm">
+                        <input type="text" id="repRitmo" placeholder="Ex: â†“  â†“â†‘  â†“  â†‘" class="w-full input-custom rounded-xl px-4 py-3 text-sm">
                     </div>
 
                     <div>
@@ -426,7 +426,7 @@
                     <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
                         <i class="fa-solid fa-star"></i> Cantores Convidados (Oportunidades)
                     </h2>
-                    <p class="text-sm text-muted-custom">Sistema garante que entram na escala apenas <strong>1 vez por mes</strong>.</p>
+                    <p class="text-sm text-muted-custom">Sistema garante que entram na escala apenas <strong>1 vez por mes</strong> (nunca na Harpa).</p>
                 </div>
                 <form onsubmit="adicionarConvidado(event)" class="space-y-4">
                     <div>
@@ -487,13 +487,13 @@
                         <label class="block text-sm font-bold text-muted-custom mb-1.5">Capotraste</label>
                         <select id="editCapotraste" class="w-full input-custom rounded-xl px-4 py-3 text-sm cursor-pointer">
                             <option value="0">Sem capotraste</option>
-                            <option value="1">1ª casa</option>
-                            <option value="2">2ª casa</option>
-                            <option value="3">3ª casa</option>
-                            <option value="4">4ª casa</option>
-                            <option value="5">5ª casa</option>
-                            <option value="6">6ª casa</option>
-                            <option value="7">7ª casa</option>
+                            <option value="1">1Âª casa</option>
+                            <option value="2">2Âª casa</option>
+                            <option value="3">3Âª casa</option>
+                            <option value="4">4Âª casa</option>
+                            <option value="5">5Âª casa</option>
+                            <option value="6">6Âª casa</option>
+                            <option value="7">7Âª casa</option>
                         </select>
                     </div>
                     <div>
@@ -561,17 +561,17 @@
                     <span class="font-bold text-muted-custom"><i class="fa-solid fa-guitar mr-1"></i> Capo:</span>
                     <select id="selectModalCapo" onchange="mudarCapotrasteModal(this.value)" class="input-custom rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer">
                         <option value="0">Sem capo</option>
-                        <option value="1">1ª casa</option>
-                        <option value="2">2ª casa</option>
-                        <option value="3">3ª casa</option>
-                        <option value="4">4ª casa</option>
-                        <option value="5">5ª casa</option>
-                        <option value="6">6ª casa</option>
-                        <option value="7">7ª casa</option>
+                        <option value="1">1Âª casa</option>
+                        <option value="2">2Âª casa</option>
+                        <option value="3">3Âª casa</option>
+                        <option value="4">4Âª casa</option>
+                        <option value="5">5Âª casa</option>
+                        <option value="6">6Âª casa</option>
+                        <option value="7">7Âª casa</option>
                     </select>
                 </div>
 
-                <!-- Sistema de Rolagem Automatica (De 0.1x a 5.0x) -->
+                <!-- Sistema de Rolagem Automatica -->
                 <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-xl border border-white/10">
                     <span class="font-bold text-muted-custom"><i class="fa-solid fa-arrows-down-to-line mr-1"></i> Rolagem:</span>
                     <button id="btnToggleRolagem" onclick="toggleRolagem()" class="btn-glow px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
@@ -651,14 +651,14 @@
     </div>
 
     <script>
-        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v24')) || [
+        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v25')) || [
             { id: '1', instrumento: 'Bateria', musico: 'Lucas' },
             { id: '2', instrumento: 'Baixo', musico: 'Matheus' },
             { id: '3', instrumento: 'Teclado', musico: 'Marcos' },
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
-        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v24')) || [
+        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v25')) || [
             { id: '1', nome: 'Tati' },
             { id: '2', nome: 'Ana' },
             { id: '3', nome: 'Samuel' },
@@ -666,24 +666,24 @@
             { id: '5', nome: 'Gabriel' }
         ];
 
-        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v24')) || [
+        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v25')) || [
             { id: '1', nome: 'Nara Julia' },
             { id: '2', nome: 'Livia' },
             { id: '3', nome: 'Elizama' },
             { id: '4', nome: 'Salete' }
         ];
 
-        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v24')) || [];
-        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v24')) || [];
-        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v24')) || [];
-        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v24') || null;
+        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v25')) || [];
+        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v25')) || [];
+        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v25')) || [];
+        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v25') || null;
 
         // Variaveis do visualizador de cifra
         let musicaAtualEmExibicao = null;
         let tomAtualTransposicao = 0;
         let capoAtualModal = 0;
         let esporadicoIntervalRolagem = null;
-        let velocidadeRolagem = 0.5; // Padrao inicial mais lento
+        let velocidadeRolagem = 0.5;
         let acumuloPixelRolagem = 0;
         let rolandoAtivo = false;
 
@@ -711,7 +711,7 @@
         };
 
         window.onload = function() {
-            const savedBg = localStorage.getItem('igreja_theme_bg_v24') || 'preto';
+            const savedBg = localStorage.getItem('igreja_theme_bg_v25') || 'preto';
             mudarFundo(savedBg);
             document.getElementById('selectBg').value = savedBg;
 
@@ -729,7 +729,7 @@
         function mudarFundo(cor) {
             document.body.classList.remove('theme-bg-preto', 'theme-bg-crimson', 'theme-bg-midnight', 'theme-bg-lime', 'theme-bg-orange', 'theme-bg-neon', 'theme-bg-pink', 'theme-bg-branco');
             document.body.classList.add(`theme-bg-${cor}`);
-            localStorage.setItem('igreja_theme_bg_v24', cor);
+            localStorage.setItem('igreja_theme_bg_v25', cor);
         }
 
         function mudarAba(aba) {
@@ -753,13 +753,13 @@
         }
 
         function salvarTudo() {
-            localStorage.setItem('igreja_banda_v24', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_cantores_v24', JSON.stringify(cantores));
-            localStorage.setItem('igreja_convidados_v24', JSON.stringify(convidados));
-            localStorage.setItem('igreja_repertorio_v24', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_cultos_v24', JSON.stringify(cultos));
-            localStorage.setItem('igreja_historico_v24', JSON.stringify(historicoEscalas));
-            localStorage.setItem('igreja_escala_ativa_titulo_v24', escalaAtivaTitulo || '');
+            localStorage.setItem('igreja_banda_v25', JSON.stringify(bandaFixa));
+            localStorage.setItem('igreja_cantores_v25', JSON.stringify(cantores));
+            localStorage.setItem('igreja_convidados_v25', JSON.stringify(convidados));
+            localStorage.setItem('igreja_repertorio_v25', JSON.stringify(repertorio));
+            localStorage.setItem('igreja_cultos_v25', JSON.stringify(cultos));
+            localStorage.setItem('igreja_historico_v25', JSON.stringify(historicoEscalas));
+            localStorage.setItem('igreja_escala_ativa_titulo_v25', escalaAtivaTitulo || '');
             
             const status = document.getElementById('statusSalvar');
             status.innerText = "Dados guardados!";
@@ -780,7 +780,7 @@
 
         function fecharBalaoEscala() {
             escalaAtivaTitulo = null;
-            localStorage.removeItem('igreja_escala_ativa_titulo_v24');
+            localStorage.removeItem('igreja_escala_ativa_titulo_v25');
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
 
@@ -909,7 +909,7 @@
 
             const capoBadge = document.getElementById('modalCapoBadge');
             if (capoAtualModal > 0) {
-                capoBadge.innerText = `Capotraste: ${capoAtualModal}ª casa`;
+                capoBadge.innerText = `Capotraste: ${capoAtualModal}Âª casa`;
                 capoBadge.classList.remove('hidden');
             } else {
                 capoBadge.classList.add('hidden');
@@ -921,8 +921,8 @@
             const secaoBatidas = document.getElementById('secaoBatidas');
             if (musicaAtualEmExibicao.ritmo || musicaAtualEmExibicao.bpm) {
                 secaoBatidas.classList.remove('hidden');
-                document.getElementById('modalBpmDisplay').innerText = musicaAtualEmExibicao.bpm ? `• ${musicaAtualEmExibicao.bpm} bpm` : '';
-                document.getElementById('modalBatidaSetas').innerText = musicaAtualEmExibicao.ritmo || '?  ??  ?  ?';
+                document.getElementById('modalBpmDisplay').innerText = musicaAtualEmExibicao.bpm ? `â€¢ ${musicaAtualEmExibicao.bpm} bpm` : '';
+                document.getElementById('modalBatidaSetas').innerText = musicaAtualEmExibicao.ritmo || 'â†“  â†“â†‘  â†“  â†‘';
             } else {
                 secaoBatidas.classList.add('hidden');
             }
@@ -1016,7 +1016,7 @@
             container.innerHTML = htmlDiagramas;
         }
 
-        /* ROLAGEM AUTOMATICA ULTRA PRECISA (0.1x A 5.0x COM PASSOS DE 0.1) */
+        /* ROLAGEM AUTOMATICA ULTRA PRECISA */
         function toggleRolagem() {
             if (rolandoAtivo) {
                 pararRolagem();
@@ -1035,7 +1035,6 @@
             acumuloPixelRolagem = 0;
             
             esporadicoIntervalRolagem = setInterval(() => {
-                // Acumulador fracionado para permitir velocidades realmente lentas (ex: 0.1px por tick)
                 acumuloPixelRolagem += velocidadeRolagem * 0.4;
                 if (acumuloPixelRolagem >= 1) {
                     let pixelsParaMover = Math.floor(acumuloPixelRolagem);
@@ -1081,14 +1080,14 @@
                 <div class="sub-card p-5 rounded-2xl flex flex-col justify-between gap-4 border">
                     <div class="space-y-1">
                         <div class="flex justify-between items-start">
-                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg border font-mono" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">Tom: ${r.tom} ${r.capotraste ? `(Capo ${r.capotraste}ª)` : ''}</span>
+                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg border font-mono" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">Tom: ${r.tom} ${r.capotraste ? `(Capo ${r.capotraste}Âª)` : ''}</span>
                             <div class="flex items-center gap-1">
                                 <button onclick="abrirModalEditarCifra('${r.id}')" class="text-amber-400 hover:text-amber-300 text-xs p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="apagarMusicaRepertorio('${r.id}')" class="text-rose-400 hover:text-rose-300 text-xs p-1" title="Apagar"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </div>
                         <h3 class="text-base font-bold pt-1">${r.nome}</h3>
-                        <p class="text-xs text-muted-custom">${r.artista} ${r.bpm ? `• ${r.bpm} bpm` : ''}</p>
+                        <p class="text-xs text-muted-custom">${r.artista} ${r.bpm ? `â€¢ ${r.bpm} bpm` : ''}</p>
                     </div>
 
                     <div class="pt-2 border-t border-white/5 flex items-center justify-between">
@@ -1232,7 +1231,7 @@
             const data = document.getElementById('dataCultoInput').value;
             const tipo = document.getElementById('tipoCultoInput').value.trim() || 'Culto';
             if (!data) return alert("Selecione uma data valida!");
-            if (cantores.length < 3) return alert("Cadastre pelo menos 3 cantores oficiais.");
+            if (cantores.length === 0) return alert("Cadastre pelo menos 1 cantor oficial para a Harpa.");
 
             let ultimosMinistros = [];
             if (cultos.length > 0) {
@@ -1240,31 +1239,46 @@
                 if (ultimo.momentos) ultimosMinistros = ultimo.momentos.map(m => m.ministro);
             }
 
+            // Pools oficiais e convidados
             let poolOficiais = [...cantores.map(c => c.nome)].sort(() => Math.random() - 0.5);
             let convidadosDisponiveis = convidados.filter(cv => contarVezesNoMes(cv.nome, data) === 0).map(cv => cv.nome).sort(() => Math.random() - 0.5);
 
-            let escolhidos = [];
-            if (convidadosDisponiveis.length > 0) escolhidos.push(convidadosDisponiveis[0]);
+            // 1. LOUVOR DA HARPA: Exclusivo com Cantores Oficiais
+            let oficiaisFiltradosHarpa = poolOficiais.filter(c => !ultimosMinistros.includes(c));
+            if (oficiaisFiltradosHarpa.length === 0) oficiaisFiltradosHarpa = poolOficiais;
+            let ministroHarpa = oficiaisFiltradosHarpa[0] || poolOficiais[0];
 
-            let oficiaisFiltrados = poolOficiais.filter(c => !ultimosMinistros.includes(c));
-            if (oficiaisFiltrados.length === 0) oficiaisFiltrados = poolOficiais;
-
-            for (let c of oficiaisFiltrados) { if (escolhidos.length < 3 && !escolhidos.includes(c)) escolhidos.push(c); }
-            for (let c of poolOficiais) { if (escolhidos.length < 3 && !escolhidos.includes(c)) escolhidos.push(c); }
+            // 2. Demais momentos (Oferta, Congregacional, etc.): Podem receber convidados ou outros oficiais
+            let escolhidosOutros = [];
+            if (convidadosDisponiveis.length > 0) {
+                escolhidosOutros.push(convidadosDisponiveis[0]);
+            }
+            
+            // Preencher o resto com oficiais restantes ou repetidos se necessario
+            for (let c of poolOficiais) {
+                if (c !== ministroHarpa && escolhidosOutros.length < 2 && !escolhidosOutros.includes(c)) {
+                    escolhidosOutros.push(c);
+                }
+            }
+            for (let c of poolOficiais) {
+                if (escolhidosOutros.length < 2 && !escolhidosOutros.includes(c)) {
+                    escolhidosOutros.push(c);
+                }
+            }
 
             cultos.push({
                 id: Date.now().toString(), data, tipo,
                 momentos: [
-                    { id: '1', titulo: 'LOUVOR DA HARPA', ministro: escolhidos[0] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
-                    { id: '2', titulo: 'LOUVOR DA OFERTA', ministro: escolhidos[1] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
-                    { id: '3', titulo: 'LOUVOR CONGREGACIONAL', ministro: escolhidos[2] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] }
+                    { id: '1', titulo: 'LOUVOR DA HARPA', ministro: ministroHarpa, musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
+                    { id: '2', titulo: 'LOUVOR DA OFERTA', ministro: escolhidosOutros[0] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
+                    { id: '3', titulo: 'LOUVOR CONGREGACIONAL', ministro: escolhidosOutros[1] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] }
                 ]
             });
 
             salvarTudo();
             renderizarCultos();
             atualizarTabelasPessoas();
-            alert("Escala gerada com sucesso!");
+            alert("Escala gerada com sucesso! (Harpa restrita a cantores oficiais)");
         }
 
         function adicionarMomento(cultoId) {
