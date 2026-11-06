@@ -715,7 +715,7 @@
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             
-            // Ocultar estritamente as abas administrativas no modo público
+            // Ocultar estritamente as abas administrativas no modo público, mantendo apenas Escalas Salvas, Novo Repertório e Lista de Cifras
             document.getElementById('tab-escala').classList.add('hidden');
             document.getElementById('tab-pessoas').classList.add('hidden');
             document.getElementById('tab-convidados').classList.add('hidden');
@@ -789,9 +789,9 @@
                 data,
                 tipo,
                 momentos: [
-                    { titulo: 'Devocional / Oraçao', ministro: '', musicas: [] },
+                    { titulo: 'Devocional / Oração', ministro: '', musicas: [] },
                     { titulo: 'Louvor Inicial', ministro: '', musicas: [] },
-                    { titulo: 'Harpa Crista / Especial', ministro: '', musicas: [] }
+                    { titulo: 'Harpa Cristã / Especial', ministro: '', musicas: [] }
                 ]
             });
             renderizarEscalaAtiva();
@@ -1093,7 +1093,7 @@
             let tomBase = musicaAtualEmExibicao.tom || 'C';
             let tomRealCalculado = transporNotaStr(tomBase, capoAtualModal + tomAtualTransposicao);
             document.getElementById('modalNomeMusica').innerText = musicaAtualEmExibicao.nome;
-            document.getElementById('modalArtistaMusica').innerText = `por ${musicaAtualEmExibicao.artista}`;
+            document.getElementById('modalArtistaMusica').innerText = `por ${musicaAtualEmExidicao?.artista || ''}`;
             document.getElementById('modalTomBadge').innerText = `Tom: ${tomRealCalculado}`;
             document.getElementById('displayTomAtual').innerText = tomRealCalculado;
 
