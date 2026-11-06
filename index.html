@@ -121,13 +121,16 @@
     <div class="max-w-6xl mx-auto space-y-6">
         
         <!-- BARRA SUPERIOR -->
-        <div class="no-print card-custom p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-sm font-bold">
+        <div id="barraSuperiorAdmin" class="no-print card-custom p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-sm font-bold">
             <div class="flex items-center gap-3">
                 <div class="w-3.5 h-3.5 rounded-full animate-pulse" style="background-color: var(--accent-color);"></div>
                 <span class="text-muted-custom">Estado: <span id="statusSalvar" class="text-emerald-400 font-mono">Dados guardados</span></span>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
+                <button onclick="copiarLinkPublico()" class="btn-glow px-4 py-2.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-share-nodes"></i> Copiar Link para a Igreja
+                </button>
                 <button onclick="exportarBackup()" class="btn-secondary-custom px-4 py-2.5 rounded-xl flex items-center gap-2">
                     <i class="fa-solid fa-cloud-arrow-down dynamic-accent"></i> Exportar Dados
                 </button>
@@ -163,19 +166,19 @@
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">
                     <i class="fa-solid fa-church"></i> Ministerio de Louvor
                 </div>
-                <h1 class="text-3xl sm:text-5xl font-black tracking-tight">Escalas & Repertorio</h1>
-                <p class="text-sm sm:text-base text-muted-custom font-medium max-w-xl">Gestao profissional de cultos, repertorio de musicas e arquivo por datas.</p>
+                <h1 id="tituloPrincipalApp" class="text-3xl sm:text-5xl font-black tracking-tight">Escalas & Repertorio</h1>
+                <p id="subtituloPrincipalApp" class="text-sm sm:text-base text-muted-custom font-medium max-w-xl">Gestao profissional de cultos, repertorio de musicas e arquivo por datas.</p>
             </div>
             
             <div class="flex flex-wrap items-center gap-3 no-print w-full md:w-auto relative z-10">
                 <button onclick="window.print()" class="btn-secondary-custom text-sm font-bold px-6 py-4 rounded-2xl flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-print"></i> Imprimir Escala Ativa
+                    <i class="fa-solid fa-print"></i> Imprimir Escala
                 </button>
             </div>
         </header>
 
         <!-- MENU DE ABAS -->
-        <div class="flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
+        <div id="menuAbasAdmin" class="flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
             <button onclick="mudarAba('escala')" id="tab-escala" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
                 <i class="fa-solid fa-calendar-days"></i> Escala Ativa
             </button>
@@ -206,12 +209,12 @@
                         <span id="textoBalaoEscala" class="text-base font-bold"></span>
                     </div>
                 </div>
-                <button onclick="fecharBalaoEscala()" class="btn-secondary-custom px-3.5 py-2 rounded-xl text-xs font-bold">
+                <button onclick="fecharBalaoEscala()" id="btnFecharBalao" class="btn-secondary-custom px-3.5 py-2 rounded-xl text-xs font-bold">
                     <i class="fa-solid fa-xmark mr-1"></i> Fechar Aviso
                 </button>
             </div>
 
-            <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-4 no-print">
+            <div id="blocoGerarEscalaAdmin" class="card-custom p-6 sm:p-8 rounded-3xl space-y-4 no-print">
                 <div class="flex items-center gap-2 text-base font-bold dynamic-accent">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <span>Criar ou Gerar Nova Escala de Culto</span>
@@ -250,8 +253,8 @@
             <div class="card-custom p-6 sm:p-10 rounded-3xl space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-5">
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-black tracking-tight">Painel da Escala Atual</h2>
-                        <p class="text-sm text-muted-custom">Preencha os dados e utilize os botoes abaixo para salvar no historico ou reiniciar.</p>
+                        <h2 id="tituloPainelEscalaAtual" class="text-xl sm:text-2xl font-black tracking-tight">Painel da Escala Atual</h2>
+                        <p id="subtituloPainelEscalaAtual" class="text-sm text-muted-custom">Preencha os dados e utilize os botoes abaixo para salvar no historico ou reiniciar.</p>
                     </div>
                 </div>
                 <div id="listaCultos" class="space-y-6"></div>
@@ -352,9 +355,9 @@
             <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
                 <div class="space-y-1.5 border-b border-white/10 pb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
-                        <i class="fa-solid fa-folder-open"></i> Historico de Escalas Salvas
+                        <i class="fa-solid fa-folder-open"></i> Escalas Salvas e Arquivadas
                     </h2>
-                    <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar ou "Abrir" para editar no painel.</p>
+                    <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar todos os detalhes, ministros e louvores.</p>
                 </div>
                 <div id="listaHistoricoDatas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
             </div>
@@ -531,7 +534,6 @@
     <div id="modalVisualizarCifra" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="card-custom p-5 sm:p-8 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col border border-white/10 relative overflow-hidden">
             
-            <!-- CABECALHO DO MODAL -->
             <div class="flex justify-between items-start border-b border-white/10 pb-4 flex-shrink-0 gap-4">
                 <div>
                     <div class="flex flex-wrap items-center gap-2 mb-1">
@@ -546,9 +548,7 @@
                 </button>
             </div>
 
-            <!-- BARRA DE FERRAMENTAS CIFRA CLUB -->
             <div class="py-3.5 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 flex-shrink-0 no-print text-xs">
-                <!-- Transpositor de Tom -->
                 <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-xl border border-white/10">
                     <span class="font-bold text-muted-custom"><i class="fa-solid fa-sliders mr-1"></i> Tom:</span>
                     <button onclick="transporTom(-1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 font-bold flex items-center justify-center">-</button>
@@ -556,7 +556,6 @@
                     <button onclick="transporTom(1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 font-bold flex items-center justify-center">+</button>
                 </div>
 
-                <!-- Seletor de Capotraste Real -->
                 <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-xl border border-white/10">
                     <span class="font-bold text-muted-custom"><i class="fa-solid fa-guitar mr-1"></i> Capo:</span>
                     <select id="selectModalCapo" onchange="mudarCapotrasteModal(this.value)" class="input-custom rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer">
@@ -571,7 +570,6 @@
                     </select>
                 </div>
 
-                <!-- Sistema de Rolagem Automatica -->
                 <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-xl border border-white/10">
                     <span class="font-bold text-muted-custom"><i class="fa-solid fa-arrows-down-to-line mr-1"></i> Rolagem:</span>
                     <button id="btnToggleRolagem" onclick="toggleRolagem()" class="btn-glow px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
@@ -582,7 +580,6 @@
                     <button onclick="ajustarVelocidadeRolagem(0.1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 font-bold flex items-center justify-center" title="+0.1x">+</button>
                 </div>
 
-                <!-- YouTube -->
                 <div id="modalYoutubeContainer" class="hidden">
                     <a id="modalLinkYoutube" href="#" target="_blank" class="btn-secondary-custom px-4 py-2 rounded-xl font-bold inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300">
                         <i class="fa-brands fa-youtube text-sm"></i> YouTube
@@ -590,10 +587,7 @@
                 </div>
             </div>
 
-            <!-- CORPO ROLAVEL COM CIFRA, DIAGRAMAS E BATIDAS -->
             <div id="corpoModalCifra" class="overflow-y-auto space-y-6 pr-2 py-4 flex-grow">
-                
-                <!-- DIAGRAMAS DE ACORDES -->
                 <div id="secaoDiagramas" class="sub-card p-4 rounded-2xl space-y-2.5">
                     <span class="text-xs font-black uppercase tracking-wider text-muted-custom flex items-center gap-1.5">
                         <i class="fa-solid fa-music dynamic-accent"></i> Acordes da Musica (Diagramas)
@@ -601,7 +595,6 @@
                     <div id="containerDiagramas" class="flex flex-wrap gap-3 pt-1"></div>
                 </div>
 
-                <!-- BATIDAS E RITMO -->
                 <div id="secaoBatidas" class="sub-card p-4 rounded-2xl space-y-2 hidden">
                     <span class="text-xs font-black uppercase tracking-wider text-muted-custom flex items-center gap-1.5">
                         <i class="fa-solid fa-drum dynamic-accent"></i> Sugestao de Batida / Ritmo <span id="modalBpmDisplay" class="font-mono text-xs text-amber-400 ml-2"></span>
@@ -609,18 +602,14 @@
                     <div class="font-mono text-base font-bold tracking-widest text-slate-200 py-1" id="modalBatidaSetas"></div>
                 </div>
 
-                <!-- CIFRA TEXTO FORMATADA -->
                 <div class="space-y-2">
                     <span class="text-xs font-bold text-muted-custom uppercase tracking-wider block">Cifra / Partitura:</span>
                     <pre id="modalTextoCifra" class="cifra-texto bg-black/60 p-5 rounded-2xl text-xs sm:text-sm overflow-x-auto text-slate-200 border border-white/5 whitespace-pre-wrap"></pre>
                 </div>
-
             </div>
 
             <div class="flex justify-end pt-3 border-t border-white/10 flex-shrink-0">
-                <button onclick="fecharModalCifra()" class="btn-secondary-custom text-xs font-bold px-6 py-2.5 rounded-xl">
-                    Fechar
-                </button>
+                <button onclick="fecharModalCifra()" class="btn-secondary-custom text-xs font-bold px-6 py-2.5 rounded-xl">Fechar</button>
             </div>
         </div>
     </div>
@@ -685,6 +674,7 @@
         let velocidadeRolagem = 0.5;
         let acumuloPixelRolagem = 0;
         let rolandoAtivo = false;
+        let modoPublicoAtivo = false;
 
         const escalaNotas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
         const escalaBemol = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
@@ -718,12 +708,43 @@
             document.getElementById('dataCultoInput').value = hoje;
             document.getElementById('tipoCultoInput').value = 'Culto de Domingo';
             
+            // VERIFICAR SE O LINK TEM O PARAMETRO DE MODO PUBLICO
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('modo') === 'publico') {
+                ativarModoPublicoVisualizacao();
+            }
+
             atualizarTabelasPessoas();
             renderizarCultos();
             renderizarHistorico();
             renderizarListaCifras();
             atualizarBalaoEscala();
         };
+
+        function ativarModoPublicoVisualizacao() {
+            modoPublicoAtivo = true;
+            // Ocultar barras de admin e botoes de criacao
+            document.getElementById('barraSuperiorAdmin').classList.add('hidden');
+            document.getElementById('menuAbasAdmin').classList.add('hidden');
+            document.getElementById('blocoGerarEscalaAdmin').classList.add('hidden');
+            document.getElementById('balaoEscalaAtiva').classList.add('hidden');
+
+            // Alterar titulos para a visao publica
+            document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
+            document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas, ministros e louvores programados para os cultos.";
+            document.getElementById('tituloPainelEscalaAtual').innerText = "Escalas e Cultos Programados";
+            document.getElementById('subtituloPainelEscalaAtual').innerText = "Veja abaixo os detalhes dos cultos, bandas e louvores.";
+        }
+
+        function copiarLinkPublico() {
+            const linkBase = window.location.href.split('?')[0];
+            const linkPublico = linkBase + '?modo=publico';
+            navigator.clipboard.writeText(linkPublico).then(() => {
+                alert("Link público copiado com sucesso! Pode enviá-lo para a igreja no WhatsApp.");
+            }).catch(err => {
+                prompt("Copie o link público abaixo:", linkPublico);
+            });
+        }
 
         function mudarFundo(cor) {
             document.body.classList.remove('theme-bg-preto', 'theme-bg-crimson', 'theme-bg-midnight', 'theme-bg-lime', 'theme-bg-orange', 'theme-bg-neon', 'theme-bg-pink', 'theme-bg-branco');
@@ -761,15 +782,17 @@
             localStorage.setItem('igreja_escala_ativa_titulo_v28', escalaAtivaTitulo || '');
             
             const status = document.getElementById('statusSalvar');
-            status.innerText = "Dados guardados!";
-            status.className = "text-emerald-400 font-mono";
-            setTimeout(() => { status.innerText = "Dados guardados"; }, 2000);
+            if (status) {
+                status.innerText = "Dados guardados!";
+                status.className = "text-emerald-400 font-mono";
+                setTimeout(() => { status.innerText = "Dados guardados"; }, 2000);
+            }
         }
 
         function atualizarBalaoEscala() {
             const balao = document.getElementById('balaoEscalaAtiva');
             const texto = document.getElementById('textoBalaoEscala');
-            if (escalaAtivaTitulo && cultos.length > 0) {
+            if (!modoPublicoAtivo && escalaAtivaTitulo && cultos.length > 0) {
                 texto.innerText = escalaAtivaTitulo;
                 balao.classList.remove('hidden');
             } else {
@@ -783,7 +806,6 @@
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
 
-        /* CADASTRO DE REPERTORIO */
         function salvarNovaMusicaRepertorio(e) {
             e.preventDefault();
             const nome = document.getElementById('repNome').value.trim();
@@ -815,7 +837,6 @@
             mudarAba('listacifras');
         }
 
-        /* EDICAO DE CIFRAS */
         function abrirModalEditarCifra(id) {
             const musica = repertorio.find(r => r.id === id);
             if (!musica) return;
@@ -866,7 +887,6 @@
             }
         }
 
-        /* VISUALIZADOR DE CIFRA (CIFRA CLUB MODE) */
         function verCifraModal(id) {
             const musica = repertorio.find(r => r.id === id);
             if (!musica) return;
@@ -1013,7 +1033,6 @@
             container.innerHTML = htmlDiagramas;
         }
 
-        /* ROLAGEM AUTOMATICA ULTRA PRECISA */
         function toggleRolagem() {
             if (rolandoAtivo) {
                 pararRolagem();
@@ -1078,10 +1097,11 @@
                     <div class="space-y-1">
                         <div class="flex justify-between items-start">
                             <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg border font-mono" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">Tom: ${r.tom} ${r.capotraste ? `(Capo ${r.capotraste}ª)` : ''}</span>
+                            ${!modoPublicoAtivo ? `
                             <div class="flex items-center gap-1">
                                 <button onclick="abrirModalEditarCifra('${r.id}')" class="text-amber-400 hover:text-amber-300 text-xs p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="apagarMusicaRepertorio('${r.id}')" class="text-rose-400 hover:text-rose-300 text-xs p-1" title="Apagar"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
+                            </div>` : ''}
                         </div>
                         <h3 class="text-base font-bold pt-1">${r.nome}</h3>
                         <p class="text-xs text-muted-custom">${r.artista} ${r.bpm ? `• ${r.bpm} bpm` : ''}</p>
@@ -1089,7 +1109,7 @@
 
                     <div class="pt-2 border-t border-white/5 flex items-center justify-between">
                         <button onclick="verCifraModal('${r.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-1.5">
-                            <i class="fa-solid fa-book-open-reader"></i> Ver Cifra (Cifra Club)
+                            <i class="fa-solid fa-book-open-reader"></i> Ver Cifra
                         </button>
                         ${r.youtube ? `<a href="${r.youtube}" target="_blank" class="text-rose-400 hover:text-rose-300 text-xs font-bold flex items-center gap-1"><i class="fa-brands fa-youtube"></i></a>` : ''}
                     </div>
@@ -1097,7 +1117,6 @@
             `).join('');
         }
 
-        /* FUNCOES DE BANDA E ESCALAS */
         function adicionarBandaFixa(e) {
             e.preventDefault();
             const instrumento = document.getElementById('instrumentoNome').value.trim();
@@ -1171,39 +1190,45 @@
 
         function atualizarTabelasPessoas() {
             const tbBanda = document.getElementById('tabelaBandaFixa');
-            tbBanda.innerHTML = bandaFixa.map(b => `
-                <tr>
-                    <td class="py-3.5 px-2 font-bold">${b.instrumento}</td>
-                    <td class="py-3.5 px-2 text-muted-custom">${b.musico}</td>
-                    <td class="py-3.5 px-2 text-center"><button onclick="removerBandaFixa('${b.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
-                </tr>
-            `).join('');
+            if (tbBanda) {
+                tbBanda.innerHTML = bandaFixa.map(b => `
+                    <tr>
+                        <td class="py-3.5 px-2 font-bold">${b.instrumento}</td>
+                        <td class="py-3.5 px-2 text-muted-custom">${b.musico}</td>
+                        <td class="py-3.5 px-2 text-center"><button onclick="removerBandaFixa('${b.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                `).join('');
+            }
 
             const tbCantores = document.getElementById('tabelaCantores');
-            tbCantores.innerHTML = cantores.map(c => {
-                let total = 0;
-                cultos.forEach(culto => { if (culto.momentos) culto.momentos.forEach(m => { if (m.ministro === c.nome) total++; }); });
-                return `
-                    <tr>
-                        <td class="py-3.5 px-2 font-bold">${c.nome}</td>
-                        <td class="py-3.5 px-2 text-center font-mono">${total}</td>
-                        <td class="py-3.5 px-2 text-center"><button onclick="removerCantor('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
-                    </tr>
-                `;
-            }).join('');
+            if (tbCantores) {
+                tbCantores.innerHTML = cantores.map(c => {
+                    let total = 0;
+                    cultos.forEach(culto => { if (culto.momentos) culto.momentos.forEach(m => { if (m.ministro === c.nome) total++; }); });
+                    return `
+                        <tr>
+                            <td class="py-3.5 px-2 font-bold">${c.nome}</td>
+                            <td class="py-3.5 px-2 text-center font-mono">${total}</td>
+                            <td class="py-3.5 px-2 text-center"><button onclick="removerCantor('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
 
             const tbConvidados = document.getElementById('tabelaConvidados');
-            tbConvidados.innerHTML = convidados.map(c => {
-                const dataAtual = document.getElementById('dataCultoInput').value || new Date().toISOString().split('T')[0];
-                let totalMes = contarVezesNoMes(c.nome, dataAtual);
-                return `
-                    <tr>
-                        <td class="py-3.5 px-2 font-bold">${c.nome}</td>
-                        <td class="py-3.5 px-2 text-center font-mono ${totalMes >= 1 ? 'text-amber-400 font-bold' : 'text-muted-custom'}">${totalMes} / 1</td>
-                        <td class="py-3.5 px-2 text-center"><button onclick="removerConvidado('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
-                    </tr>
-                `;
-            }).join('');
+            if (tbConvidados) {
+                tbConvidados.innerHTML = convidados.map(c => {
+                    const dataAtual = document.getElementById('dataCultoInput') ? document.getElementById('dataCultoInput').value : new Date().toISOString().split('T')[0];
+                    let totalMes = contarVezesNoMes(c.nome, dataAtual);
+                    return `
+                        <tr>
+                            <td class="py-3.5 px-2 font-bold">${c.nome}</td>
+                            <td class="py-3.5 px-2 text-center font-mono ${totalMes >= 1 ? 'text-amber-400 font-bold' : 'text-muted-custom'}">${totalMes} / 1</td>
+                            <td class="py-3.5 px-2 text-center"><button onclick="removerConvidado('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
         }
 
         function adicionarCultoManual() {
@@ -1271,7 +1296,7 @@
             salvarTudo();
             renderizarCultos();
             atualizarTabelasPessoas();
-            alert("Escala gerada com sucesso! (Harpa restrita a cantores oficiais)");
+            alert("Escala gerada com sucesso!");
         }
 
         function adicionarMomento(cultoId) {
@@ -1408,7 +1433,15 @@
             }).join('');
 
             containerConteudo.innerHTML = htmlEscala;
-            document.getElementById('btnModalCarregarEscala').setAttribute('onclick', `carregarEscalaDoHistorico('${hist.id}')`);
+            
+            const btnCarregar = document.getElementById('btnModalCarregarEscala');
+            if (modoPublicoAtivo) {
+                btnCarregar.classList.add('hidden');
+            } else {
+                btnCarregar.classList.remove('hidden');
+                btnCarregar.setAttribute('onclick', `carregarEscalaDoHistorico('${hist.id}')`);
+            }
+            
             document.getElementById('modalVisualizarEscala').classList.remove('hidden');
         }
 
@@ -1436,10 +1469,10 @@
                     </div>
                     <div class="flex justify-between items-center pt-3 border-t border-white/5">
                         <div class="flex items-center gap-2">
-                            <button onclick="verEscalaModal('${hist.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-1.5"><i class="fa-solid fa-eye"></i> Ver</button>
-                            <button onclick="carregarEscalaDoHistorico('${hist.id}')" class="btn-secondary-custom text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Abrir</button>
+                            <button onclick="verEscalaModal('${hist.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-1.5"><i class="fa-solid fa-eye"></i> Ver Escala</button>
+                            ${!modoPublicoAtivo ? `<button onclick="carregarEscalaDoHistorico('${hist.id}')" class="btn-secondary-custom text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Abrir</button>` : ''}
                         </div>
-                        <button onclick="apagarHistorico('${hist.id}')" class="text-rose-400 hover:text-rose-300 text-sm px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>
+                        ${!modoPublicoAtivo ? `<button onclick="apagarHistorico('${hist.id}')" class="text-rose-400 hover:text-rose-300 text-sm px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -1449,25 +1482,39 @@
             const container = document.getElementById('listaCultos');
             cultos.sort((a, b) => new Date(a.data) - new Date(b.data));
             if (cultos.length === 0) {
-                container.innerHTML = `<div class="text-center py-14 text-muted-custom text-sm italic"><p>Painel limpo. Crie uma nova escala acima.</p></div>`;
+                container.innerHTML = `<div class="text-center py-14 text-muted-custom text-sm italic"><p>Nenhum culto ativo no painel no momento. Consulte as 'Escalas Salvas' acima.</p></div>`;
                 return;
             }
             let todosCantoresDisponiveis = [...cantores.map(c => c.nome), ...convidados.map(c => c.nome)];
+            
             let htmlCultos = cultos.map(culto => {
                 const [ano, mes, dia] = culto.data.split('-');
                 const dataFormatada = `${dia}/${mes}/${ano}`;
                 const bandaHtml = bandaFixa.map(b => `<span class="sub-card border text-sm px-3.5 py-2 rounded-xl font-medium inline-flex items-center gap-2"><strong class="dynamic-accent">${b.instrumento}:</strong> ${b.musico}</span>`).join('');
                 
                 const momentosHtml = (culto.momentos || []).map(m => {
-                    const musicasHtml = (m.musicas || []).map((mus, idx) => `
-                        <div class="grid grid-cols-1 sm:grid-cols-6 gap-3 pt-2 items-center">
-                            <div class="col-span-2"><input type="text" placeholder="Nome da Musica" value="${mus.musica || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'musica', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm"></div>
-                            <div><input type="text" placeholder="Tom" value="${mus.tom || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'tom', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center font-bold"></div>
-                            <div><input type="text" placeholder="Ritmo" value="${mus.ritmo || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'ritmo', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center"></div>
-                            <div><input type="text" placeholder="BPM" value="${mus.bpm || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'bpm', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center"></div>
-                            <div class="flex items-center gap-2"><input type="text" placeholder="Cifra / YouTube" value="${mus.cifra || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'cifra', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm">${m.musicas.length > 1 ? `<button onclick="removerMusicaMomento('${culto.id}', '${m.id}', ${idx})" class="text-rose-400 p-2"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>
-                        </div>
-                    `).join('');
+                    const musicasHtml = (m.musicas || []).map((mus, idx) => {
+                        if (modoPublicoAtivo) {
+                            return `
+                                <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2 pb-2 items-center border-b border-white/5 text-xs">
+                                    <div class="sm:col-span-2 font-bold text-sm">${mus.musica || 'Musica nao informada'}</div>
+                                    <div><span class="text-muted-custom">Tom:</span> <span class="font-bold dynamic-accent">${mus.tom || '-'}</span></div>
+                                    <div><span class="text-muted-custom">Ritmo:</span> ${mus.ritmo || '-'}</div>
+                                    <div><span class="text-muted-custom">BPM:</span> ${mus.bpm || '-'}</div>
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div class="grid grid-cols-1 sm:grid-cols-6 gap-3 pt-2 items-center">
+                                    <div class="col-span-2"><input type="text" placeholder="Nome da Musica" value="${mus.musica || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'musica', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm"></div>
+                                    <div><input type="text" placeholder="Tom" value="${mus.tom || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'tom', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center font-bold"></div>
+                                    <div><input type="text" placeholder="Ritmo" value="${mus.ritmo || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'ritmo', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center"></div>
+                                    <div><input type="text" placeholder="BPM" value="${mus.bpm || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'bpm', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center"></div>
+                                    <div class="flex items-center gap-2"><input type="text" placeholder="Cifra / YouTube" value="${mus.cifra || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'cifra', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm">${m.musicas.length > 1 ? `<button onclick="removerMusicaMomento('${culto.id}', '${m.id}', ${idx})" class="text-rose-400 p-2"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>
+                                </div>
+                            `;
+                        }
+                    }).join('');
 
                     return `
                         <div class="sub-card p-5 rounded-2xl space-y-3.5 relative border border-white/10">
@@ -1476,20 +1523,20 @@
                                 <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                                     <div class="flex items-center gap-2">
                                         <span class="text-sm text-muted-custom font-bold">Ministro:</span>
+                                        ${modoPublicoAtivo ? `<span class="text-sm font-bold text-white px-3 py-1 rounded-xl bg-black/40 border border-white/10">${m.ministro || 'Nao definido'}</span>` : `
                                         <select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-4 py-2 text-sm font-bold">
                                             <option value="">-- Selecionar --</option>
                                             ${todosCantoresDisponiveis.map(nome => `<option value="${nome}" ${m.ministro === nome ? 'selected' : ''}>${nome}</option>`).join('')}
-                                        </select>
+                                        </select>`}
                                     </div>
-                                    <button onclick="removerMomento('${culto.id}', '${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-3 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 font-bold flex items-center gap-1.5" title="Remover este bloco inteiro">
-                                        <i class="fa-solid fa-trash-can"></i> Remover Bloco
-                                    </button>
+                                    ${!modoPublicoAtivo ? `<button onclick="removerMomento('${culto.id}', '${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-3 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 font-bold flex items-center gap-1.5" title="Remover este bloco inteiro"><i class="fa-solid fa-trash-can"></i> Remover Bloco</button>` : ''}
                                 </div>
                             </div>
                             <div class="space-y-2.5">${musicasHtml}</div>
+                            ${!modoPublicoAtivo ? `
                             <div class="pt-2 flex justify-end">
                                 <button onclick="adicionarMusicaMomento('${culto.id}', '${m.id}')" class="text-xs font-bold text-amber-400 hover:underline"><i class="fa-solid fa-plus"></i> Adicionar Musica</button>
-                            </div>
+                            </div>` : ''}
                         </div>
                     `;
                 }).join('');
@@ -1500,7 +1547,7 @@
                             <span class="text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span>
                             <div class="flex items-center gap-3">
                                 <span class="text-sm font-mono text-muted-custom">${dataFormatada}</span>
-                                <button onclick="removerCulto('${culto.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20"><i class="fa-solid fa-trash-can mr-1"></i> Apagar Culto</button>
+                                ${!modoPublicoAtivo ? `<button onclick="removerCulto('${culto.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20"><i class="fa-solid fa-trash-can mr-1"></i> Apagar Culto</button>` : ''}
                             </div>
                         </div>
                         <div>
@@ -1511,25 +1558,28 @@
                             <span class="text-xs font-bold text-muted-custom uppercase block">Blocos de Louvor e Ministros:</span>
                             ${momentosHtml}
                         </div>
+                        ${!modoPublicoAtivo ? `
                         <div class="pt-3 flex justify-center">
                             <button onclick="adicionarMomento('${culto.id}')" class="btn-secondary-custom px-5 py-3 rounded-xl text-xs font-bold">
                                 <i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Novo Bloco de Louvor
                             </button>
-                        </div>
+                        </div>` : ''}
                     </div>
                 `;
             }).join('');
 
-            htmlCultos += `
-                <div class="pt-6 flex flex-wrap justify-center gap-4">
-                    <button onclick="salvarEscalaNoHistorico()" class="btn-glow text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 shadow-xl">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar e Arquivar Escala
-                    </button>
-                    <button onclick="reiniciarEscalaAtiva()" class="btn-secondary-custom text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 hover:text-rose-400 border-rose-500/30">
-                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Escala Ativa (Zerar)
-                    </button>
-                </div>
-            `;
+            if (!modoPublicoAtivo) {
+                htmlCultos += `
+                    <div class="pt-6 flex flex-wrap justify-center gap-4">
+                        <button onclick="salvarEscalaNoHistorico()" class="btn-glow text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 shadow-xl">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Salvar e Arquivar Escala
+                        </button>
+                        <button onclick="reiniciarEscalaAtiva()" class="btn-secondary-custom text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 hover:text-rose-400 border-rose-500/30">
+                            <i class="fa-solid fa-rotate-right"></i> Reiniciar Escala Ativa (Zerar)
+                        </button>
+                    </div>
+                `;
+            }
             container.innerHTML = htmlCultos;
         }
 
