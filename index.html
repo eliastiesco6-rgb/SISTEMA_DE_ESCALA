@@ -251,7 +251,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-5">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-black tracking-tight">Painel da Escala Atual</h2>
-                        <p class="text-sm text-muted-custom">Preencha os dados e clique em "Salvar Escala" para enviar para o arquivo de datas.</p>
+                        <p class="text-sm text-muted-custom">Preencha os dados e utilize os botoes abaixo para salvar no historico ou reiniciar.</p>
                     </div>
                 </div>
                 <div id="listaCultos" class="space-y-6"></div>
@@ -651,14 +651,14 @@
     </div>
 
     <script>
-        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v25')) || [
+        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v26')) || [
             { id: '1', instrumento: 'Bateria', musico: 'Lucas' },
             { id: '2', instrumento: 'Baixo', musico: 'Matheus' },
             { id: '3', instrumento: 'Teclado', musico: 'Marcos' },
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
-        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v25')) || [
+        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v26')) || [
             { id: '1', nome: 'Tati' },
             { id: '2', nome: 'Ana' },
             { id: '3', nome: 'Samuel' },
@@ -666,19 +666,18 @@
             { id: '5', nome: 'Gabriel' }
         ];
 
-        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v25')) || [
+        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v26')) || [
             { id: '1', nome: 'Nara Julia' },
             { id: '2', nome: 'Livia' },
             { id: '3', nome: 'Elizama' },
             { id: '4', nome: 'Salete' }
         ];
 
-        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v25')) || [];
-        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v25')) || [];
-        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v25')) || [];
-        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v25') || null;
+        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v26')) || [];
+        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v26')) || [];
+        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v26')) || [];
+        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v26') || null;
 
-        // Variaveis do visualizador de cifra
         let musicaAtualEmExibicao = null;
         let tomAtualTransposicao = 0;
         let capoAtualModal = 0;
@@ -711,7 +710,7 @@
         };
 
         window.onload = function() {
-            const savedBg = localStorage.getItem('igreja_theme_bg_v25') || 'preto';
+            const savedBg = localStorage.getItem('igreja_theme_bg_v26') || 'preto';
             mudarFundo(savedBg);
             document.getElementById('selectBg').value = savedBg;
 
@@ -729,7 +728,7 @@
         function mudarFundo(cor) {
             document.body.classList.remove('theme-bg-preto', 'theme-bg-crimson', 'theme-bg-midnight', 'theme-bg-lime', 'theme-bg-orange', 'theme-bg-neon', 'theme-bg-pink', 'theme-bg-branco');
             document.body.classList.add(`theme-bg-${cor}`);
-            localStorage.setItem('igreja_theme_bg_v25', cor);
+            localStorage.setItem('igreja_theme_bg_v26', cor);
         }
 
         function mudarAba(aba) {
@@ -753,13 +752,13 @@
         }
 
         function salvarTudo() {
-            localStorage.setItem('igreja_banda_v25', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_cantores_v25', JSON.stringify(cantores));
-            localStorage.setItem('igreja_convidados_v25', JSON.stringify(convidados));
-            localStorage.setItem('igreja_repertorio_v25', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_cultos_v25', JSON.stringify(cultos));
-            localStorage.setItem('igreja_historico_v25', JSON.stringify(historicoEscalas));
-            localStorage.setItem('igreja_escala_ativa_titulo_v25', escalaAtivaTitulo || '');
+            localStorage.setItem('igreja_banda_v26', JSON.stringify(bandaFixa));
+            localStorage.setItem('igreja_cantores_v26', JSON.stringify(cantores));
+            localStorage.setItem('igreja_convidados_v26', JSON.stringify(convidados));
+            localStorage.setItem('igreja_repertorio_v26', JSON.stringify(repertorio));
+            localStorage.setItem('igreja_cultos_v26', JSON.stringify(cultos));
+            localStorage.setItem('igreja_historico_v26', JSON.stringify(historicoEscalas));
+            localStorage.setItem('igreja_escala_ativa_titulo_v26', escalaAtivaTitulo || '');
             
             const status = document.getElementById('statusSalvar');
             status.innerText = "Dados guardados!";
@@ -780,7 +779,7 @@
 
         function fecharBalaoEscala() {
             escalaAtivaTitulo = null;
-            localStorage.removeItem('igreja_escala_ativa_titulo_v25');
+            localStorage.removeItem('igreja_escala_ativa_titulo_v26');
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
 
@@ -917,7 +916,6 @@
 
             document.getElementById('displayTomAtual').innerText = tomRealCalculado;
 
-            // Ritmo e BPM
             const secaoBatidas = document.getElementById('secaoBatidas');
             if (musicaAtualEmExibicao.ritmo || musicaAtualEmExibicao.bpm) {
                 secaoBatidas.classList.remove('hidden');
@@ -927,7 +925,6 @@
                 secaoBatidas.classList.add('hidden');
             }
 
-            // YouTube
             const ytContainer = document.getElementById('modalYoutubeContainer');
             const ytLink = document.getElementById('modalLinkYoutube');
             if (musicaAtualEmExibicao.youtube) {
@@ -1239,22 +1236,18 @@
                 if (ultimo.momentos) ultimosMinistros = ultimo.momentos.map(m => m.ministro);
             }
 
-            // Pools oficiais e convidados
             let poolOficiais = [...cantores.map(c => c.nome)].sort(() => Math.random() - 0.5);
             let convidadosDisponiveis = convidados.filter(cv => contarVezesNoMes(cv.nome, data) === 0).map(cv => cv.nome).sort(() => Math.random() - 0.5);
 
-            // 1. LOUVOR DA HARPA: Exclusivo com Cantores Oficiais
             let oficiaisFiltradosHarpa = poolOficiais.filter(c => !ultimosMinistros.includes(c));
             if (oficiaisFiltradosHarpa.length === 0) oficiaisFiltradosHarpa = poolOficiais;
             let ministroHarpa = oficiaisFiltradosHarpa[0] || poolOficiais[0];
 
-            // 2. Demais momentos (Oferta, Congregacional, etc.): Podem receber convidados ou outros oficiais
             let escolhidosOutros = [];
             if (convidadosDisponiveis.length > 0) {
                 escolhidosOutros.push(convidadosDisponiveis[0]);
             }
             
-            // Preencher o resto com oficiais restantes ou repetidos se necessario
             for (let c of poolOficiais) {
                 if (c !== ministroHarpa && escolhidosOutros.length < 2 && !escolhidosOutros.includes(c)) {
                     escolhidosOutros.push(c);
@@ -1354,7 +1347,8 @@
             }
         }
 
-        function salvarEscalaAtualNoHistorico() {
+        /* BOTOES SEPARADOS: SALVAR NO HISTORICO VS REINICIAR ESCALA ATIVA */
+        function salvarEscalaNoHistorico() {
             if (cultos.length === 0) return alert("Nao ha nenhuma escala no painel para salvar!");
             const idHistorico = 'hist_' + Date.now();
             const datasResumo = cultos.map(c => {
@@ -1364,13 +1358,23 @@
 
             historicoEscalas.push({ id: idHistorico, tituloResumo: datasResumo, dataCriacao: new Date().toLocaleDateString('pt-BR'), cultos: [...cultos] });
             escalaAtivaTitulo = datasResumo;
-            cultos = [];
             salvarTudo();
-            renderizarCultos();
             renderizarHistorico();
             atualizarBalaoEscala();
-            alert("Escala salva com sucesso!");
+            alert("Escala guardada e arquivada com sucesso!");
             mudarAba('historico');
+        }
+
+        function reiniciarEscalaAtiva() {
+            if (confirm("Tens a certeza que desejas limpar/reiniciar o painel da escala ativa? (Certifica-te de que ja guardaste no historico se precisares)")) {
+                cultos = [];
+                escalaAtivaTitulo = null;
+                salvarTudo();
+                renderizarCultos();
+                atualizarBalaoEscala();
+                atualizarTabelasPessoas();
+                alert("Escala ativa limpa com sucesso!");
+            }
         }
 
         function carregarEscalaDoHistorico(id) {
@@ -1469,7 +1473,18 @@
                 }).join('');
                 return `<div class="sub-card p-6 sm:p-8 rounded-3xl space-y-5"><div class="flex justify-between items-center border-b border-white/10 pb-4"><span class="text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span><span class="text-sm font-mono text-muted-custom">${dataFormatada}</span></div><div><span class="text-xs font-bold text-muted-custom uppercase block mb-2.5">Banda Fixa:</span><div class="flex flex-wrap gap-2.5">${bandaHtml}</div></div><div class="space-y-3.5"><span class="text-xs font-bold text-muted-custom uppercase block">Cantores e Repertorio:</span>${momentosHtml}</div><div class="pt-3 flex justify-center"><button onclick="adicionarMomento('${culto.id}')" class="btn-secondary-custom px-5 py-3 rounded-xl text-xs font-bold"><i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Momento</button></div></div>`;
             }).join('');
-            htmlCultos += `<div class="pt-6 flex justify-center"><button onclick="salvarEscalaAtualNoHistorico()" class="btn-glow text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 shadow-xl"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar Escala (Zerar Painel e Arquivar)</button></div>`;
+
+            // Botoes separados para Salvar/Arquivar e Reiniciar
+            htmlCultos += `
+                <div class="pt-6 flex flex-wrap justify-center gap-4">
+                    <button onclick="salvarEscalaNoHistorico()" class="btn-glow text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 shadow-xl">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar e Arquivar Escala
+                    </button>
+                    <button onclick="reiniciarEscalaAtiva()" class="btn-secondary-custom text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 hover:text-rose-400 border-rose-500/30">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Escala Ativa (Zerar)
+                    </button>
+                </div>
+            `;
             container.innerHTML = htmlCultos;
         }
 
