@@ -704,20 +704,17 @@
             mudarFundo(savedBg);
             document.getElementById('selectBg').value = savedBg;
 
-            const hoje = new Date().toISOString().split('T')[0];
-            const inpData = document.getElementById('dataCultoInput');
-            if (inpData) inpData.value = hoje;
-            const inpTipo = document.getElementById('tipoCultoInput');
-            if (inpTipo) inpTipo.value = 'Culto de Domingo';
-            
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('modo') === 'publico') {
                 ativarModoPublicoVisualizacao();
             } else {
-                atualizarTabelasPessoas();
-                renderizarCultos();
+                const hoje = new Date().toISOString().split('T')[0];
+                document.getElementById('dataCultoInput').value = hoje;
+                document.getElementById('tipoCultoInput').value = 'Culto de Domingo';
             }
 
+            atualizarTabelasPessoas();
+            renderizarCultos();
             renderizarHistorico();
             renderizarListaCifras();
             atualizarBalaoEscala();
@@ -727,16 +724,16 @@
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             
-            // Ocultar abas administrativas, mantendo apenas "Escalas Salvas" e "Lista de Cifras"
+            // Ocultar abas de administracao pura, mantendo apenas Escalas Salvas e Lista de Cifras visiveis para a igreja
             document.getElementById('tab-escala').classList.add('hidden');
             document.getElementById('tab-repertorio').classList.add('hidden');
             document.getElementById('tab-pessoas').classList.add('hidden');
             document.getElementById('tab-convidados').classList.add('hidden');
 
-            document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor - Igreja";
-            document.getElementById('subtituloPrincipalApp').innerText = "Consulte todas as escalas arquivadas, ministros e louvores programados.";
-
-            // Abrir direto na aba de Escalas Salvas para o publico
+            document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
+            document.getElementById('subtituloPrincipalApp').innerText = "Consulte todas as escalas salvas, ministros e louvores programados.";
+            
+            // Mudar automaticamente para a aba de Historico (Escalas Salvas) ao abrir o link publico
             mudarAba('historico');
         }
 
@@ -799,7 +796,7 @@
             if (!modoPublicoAtivo && escalaAtivaTitulo && cultos.length > 0) {
                 texto.innerText = escalaAtivaTitulo;
                 balao.classList.remove('hidden');
-            } else if (balao) {
+            } else {
                 balao.classList.add('hidden');
             }
         }
@@ -1461,7 +1458,6 @@
 
         function renderizarHistorico() {
             const container = document.getElementById('listaHistoricoDatas');
-            if (!container) return;
             if (historicoEscalas.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma escala salva no momento.</div>`;
                 return;
@@ -1485,92 +1481,11 @@
 
         function renderizarCultos() {
             const container = document.getElementById('listaCultos');
-            if (!container) return;
             cultos.sort((a, b) => new Date(a.data) - new Date(b.data));
             if (cultos.length === 0) {
-                container.innerHTML = `<div class="text-center py-14 text-muted-custom text-sm italic"><p>Nenhum culto ativo no painel no momento. Consulte as 'Escalas Salvas' acima.</p></div>`;
+                container.innerHTML = `<div class="text-center py-14 text-muted-custom text-sm italic"><p>Nenhum culto ativo no painel no momento.</p></div>`;
                 return;
             }
-            let todosCantoresDisponiveis = [...cantores.map(c => c.nome), ...convidados.map(c => c.nome)];
-            
-            let htmlCultos = cultos.map(culto => {
-                const [ano, mes, dia] = culto.data.split('-');
-                const dataFormatada = `${dia}/${mes}/${ano}`;
-                const bandaHtml = bandaFixa.map(b => `<span class="sub-card border text-sm px-3.5 py-2 rounded-xl font-medium inline-flex items-center gap-2"><strong class="dynamic-accent">${b.instrumento}:</strong> ${b.musico}</span>`).join('');
-                
-                const momentosHtml = (culto.momentos || []).map(m => {
-                    const musicasHtml = (m.musicas || []).map((mus, idx) => {
-                        return `
-                            <div class="grid grid-cols-1 sm:grid-cols-6 gap-3 pt-2 items-center">
-                                <div class="col-span-2"><input type="text" placeholder="Nome da Musica" value="${mus.musica || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'musica', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm"></div>
-                                <div><input type="text" placeholder="Tom" value="${mus.tom || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'tom', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center font-bold"></div>
-                                <div><input type="text" placeholder="Ritmo" value="${mus.ritmo || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'ritmo', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center"></div>
-                                <div><input type="text" placeholder="BPM" value="${mus.bpm || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'bpm', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center"></div>
-                                <div class="flex items-center gap-2"><input type="text" placeholder="Cifra / YouTube" value="${mus.cifra || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'cifra', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm">${m.musicas.length > 1 ? `<button onclick="removerMusicaMomento('${culto.id}', '${m.id}', ${idx})" class="text-rose-400 p-2"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    return `
-                        <div class="sub-card p-5 rounded-2xl space-y-3.5 relative border border-white/10">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/5 pb-3">
-                                <span class="text-sm font-black uppercase dynamic-accent tracking-wider"><i class="fa-solid fa-music"></i> ${m.titulo}</span>
-                                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm text-muted-custom font-bold">Ministro:</span>
-                                        <select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-4 py-2 text-sm font-bold">
-                                            <option value="">-- Selecionar --</option>
-                                            ${todosCantoresDisponiveis.map(nome => `<option value="${nome}" ${m.ministro === nome ? 'selected' : ''}>${nome}</option>`).join('')}
-                                        </select>
-                                    </div>
-                                    <button onclick="removerMomento('${culto.id}', '${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-3 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 font-bold flex items-center gap-1.5" title="Remover este bloco inteiro"><i class="fa-solid fa-trash-can"></i> Remover Bloco</button>
-                                </div>
-                            </div>
-                            <div class="space-y-2.5">${musicasHtml}</div>
-                            <div class="pt-2 flex justify-end">
-                                <button onclick="adicionarMusicaMomento('${culto.id}', '${m.id}')" class="text-xs font-bold text-amber-400 hover:underline"><i class="fa-solid fa-plus"></i> Adicionar Musica</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                return `
-                    <div class="sub-card p-6 sm:p-8 rounded-3xl space-y-5">
-                        <div class="flex justify-between items-center border-b border-white/10 pb-4">
-                            <span class="text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span>
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-mono text-muted-custom">${dataFormatada}</span>
-                                <button onclick="removerCulto('${culto.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20"><i class="fa-solid fa-trash-can mr-1"></i> Apagar Culto</button>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold text-muted-custom uppercase block mb-2.5">Banda Fixa:</span>
-                            <div class="flex flex-wrap gap-2.5">${bandaHtml}</div>
-                        </div>
-                        <div class="space-y-4">
-                            <span class="text-xs font-bold text-muted-custom uppercase block">Blocos de Louvor e Ministros:</span>
-                            ${momentosHtml}
-                        </div>
-                        <div class="pt-3 flex justify-center">
-                            <button onclick="adicionarMomento('${culto.id}')" class="btn-secondary-custom px-5 py-3 rounded-xl text-xs font-bold">
-                                <i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Novo Bloco de Louvor
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            htmlCultos += `
-                <div class="pt-6 flex flex-wrap justify-center gap-4">
-                    <button onclick="salvarEscalaNoHistorico()" class="btn-glow text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 shadow-xl">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar e Arquivar Escala
-                    </button>
-                    <button onclick="reiniciarEscalaAtiva()" class="btn-secondary-custom text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 hover:text-rose-400 border-rose-500/30">
-                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Escala Ativa (Zerar)
-                    </button>
-                </div>
-            `;
-            container.innerHTML = htmlCultos;
         }
 
         function exportarBackup() {
