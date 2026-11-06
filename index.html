@@ -179,10 +179,7 @@
 
         <!-- MENU DE ABAS -->
         <div id="menuAbasAdmin" class="flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
-            <button onclick="mudarAba('escala')" id="tab-escala" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
-                <i class="fa-solid fa-calendar-days"></i> Escala Ativa
-            </button>
-            <button onclick="mudarAba('historico')" id="tab-historico" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
+            <button onclick="mudarAba('historico')" id="tab-historico" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2">
                 <i class="fa-solid fa-folder-open"></i> Escalas Salvas
             </button>
             <button onclick="mudarAba('repertorio')" id="tab-repertorio" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
@@ -191,74 +188,6 @@
             <button onclick="mudarAba('listacifras')" id="tab-listacifras" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
                 <i class="fa-solid fa-book-open"></i> Lista de Cifras
             </button>
-            <button onclick="mudarAba('pessoas')" id="tab-pessoas" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
-                <i class="fa-solid fa-users-gear"></i> Banda e Cantores
-            </button>
-            <button onclick="mudarAba('convidados')" id="tab-convidados" class="px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2">
-                <i class="fa-solid fa-star"></i> Convidados
-            </button>
-        </div>
-
-        <!-- CONTEUDO: ESCALA ATIVA -->
-        <div id="conteudo-escala" class="space-y-6 hidden">
-            <div id="balaoEscalaAtiva" class="hidden card-custom p-5 rounded-2xl border flex items-center justify-between gap-4" style="border-color: var(--accent-color); background-color: var(--accent-glow);">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-circle-info text-xl dynamic-accent"></i>
-                    <div>
-                        <span class="text-xs font-black uppercase tracking-wider text-muted-custom block">A visualizar escala guardada:</span>
-                        <span id="textoBalaoEscala" class="text-base font-bold"></span>
-                    </div>
-                </div>
-                <button onclick="fecharBalaoEscala()" id="btnFecharBalao" class="btn-secondary-custom px-3.5 py-2 rounded-xl text-xs font-bold">
-                    <i class="fa-solid fa-xmark mr-1"></i> Fechar Aviso
-                </button>
-            </div>
-
-            <div id="blocoGerarEscalaAdmin" class="card-custom p-6 sm:p-8 rounded-3xl space-y-4 no-print">
-                <div class="flex items-center gap-2 text-base font-bold dynamic-accent">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>Criar ou Gerar Nova Escala de Culto</span>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-                    <div>
-                        <label class="block text-sm font-bold text-muted-custom mb-1.5">Data do Culto</label>
-                        <input type="date" id="dataCultoInput" class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm font-bold focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-muted-custom mb-1.5">Nome / Tipo do Culto</label>
-                        <input type="text" id="tipoCultoInput" list="sugestoesCultos" placeholder="Ex: Culto de Domingo..." class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm font-bold focus:outline-none">
-                        <datalist id="sugestoesCultos">
-                            <option value="Culto de Domingo">
-                            <option value="Culto de Quinta-feira">
-                            <option value="Culto Especial / Vigilia">
-                            <option value="Ensaio Geral">
-                            <option value="Culto de Jovens">
-                            <option value="Santa Ceia">
-                        </datalist>
-                    </div>
-                    <div>
-                        <button onclick="gerarEscalaAutomatica()" class="w-full btn-glow text-sm font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-shuffle"></i> Gerar Automatica
-                        </button>
-                    </div>
-                    <div>
-                        <button onclick="adicionarCultoManual()" class="w-full btn-secondary-custom text-sm font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus-circle"></i> Adicionar Vazio
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-custom p-6 sm:p-10 rounded-3xl space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-5">
-                    <div>
-                        <h2 id="tituloPainelEscalaAtual" class="text-xl sm:text-2xl font-black tracking-tight">Painel da Escala Atual</h2>
-                        <p id="subtituloPainelEscalaAtual" class="text-sm text-muted-custom">Preencha os dados e utilize os botoes abaixo para salvar no historico ou reiniciar.</p>
-                    </div>
-                </div>
-                <div id="listaCultos" class="space-y-6"></div>
-            </div>
         </div>
 
         <!-- CONTEUDO: NOVO REPERTORIO -->
@@ -360,96 +289,6 @@
                     <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar todos os detalhes, ministros e louvores.</p>
                 </div>
                 <div id="listaHistoricoDatas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-            </div>
-        </div>
-
-        <!-- CONTEUDO: PESSOAS E BANDA -->
-        <div id="conteudo-pessoas" class="space-y-6 hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
-                    <h2 class="text-base font-bold flex items-center gap-2 dynamic-accent">
-                        <i class="fa-solid fa-guitar"></i> Banda Fixa (Instrumentos)
-                    </h2>
-                    <form onsubmit="adicionarBandaFixa(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-bold text-muted-custom mb-1.5">Instrumento / Funcao</label>
-                            <input type="text" id="instrumentoNome" placeholder="Ex: Teclado..." required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-muted-custom mb-1.5">Musico Responsavel</label>
-                            <input type="text" id="musicoNome" placeholder="Nome do Musico" required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
-                        </div>
-                        <button type="submit" class="w-full btn-glow text-sm font-bold py-4 rounded-2xl shadow-md">Adicionar a Banda Fixa</button>
-                    </form>
-                    <div class="overflow-x-auto pt-3">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-white/10 text-muted-custom">
-                                    <th class="py-3 px-2">Instrumento</th>
-                                    <th class="py-3 px-2">Musico</th>
-                                    <th class="py-3 px-2 text-center">Acoes</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaBandaFixa" class="divide-y divide-white/5"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
-                    <h2 class="text-base font-bold flex items-center gap-2 dynamic-accent">
-                        <i class="fa-solid fa-microphone-lines"></i> Cantores Oficiais (Banda)
-                    </h2>
-                    <form onsubmit="adicionarCantor(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-bold text-muted-custom mb-1.5">Nome do Cantor Oficial</label>
-                            <input type="text" id="novoCantorNome" placeholder="Ex: Tati..." required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
-                        </div>
-                        <button type="submit" class="w-full btn-glow text-sm font-bold py-4 rounded-2xl shadow-md">Adicionar Cantor Oficial</button>
-                    </form>
-                    <div class="overflow-x-auto pt-3">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-white/10 text-muted-custom">
-                                    <th class="py-3 px-2">Nome</th>
-                                    <th class="py-3 px-2 text-center">Escalas Este Mes</th>
-                                    <th class="py-3 px-2 text-center">Acoes</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaCantores" class="divide-y divide-white/5"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTEUDO: CONVIDADOS -->
-        <div id="conteudo-convidados" class="space-y-6 hidden">
-            <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5 max-w-2xl mx-auto">
-                <div class="space-y-1.5">
-                    <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
-                        <i class="fa-solid fa-star"></i> Cantores Convidados (Oportunidades)
-                    </h2>
-                    <p class="text-sm text-muted-custom">Sistema garante que entram na escala apenas <strong>1 vez por mes</strong> (nunca na Harpa).</p>
-                </div>
-                <form onsubmit="adicionarConvidado(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-muted-custom mb-1.5">Nome do Cantor Convidado</label>
-                        <input type="text" id="novoConvidadoNome" placeholder="Ex: Nara Julia..." required class="w-full input-custom rounded-2xl px-4 py-3.5 text-sm">
-                    </div>
-                    <button type="submit" class="w-full btn-glow text-sm font-bold py-4 rounded-2xl shadow-md">Adicionar Cantor Convidado</button>
-                </form>
-                <div class="overflow-x-auto pt-3">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-white/10 text-muted-custom">
-                                <th class="py-3 px-2">Nome</th>
-                                <th class="py-3 px-2 text-center">Escalas Este Mes (Max 1)</th>
-                                <th class="py-3 px-2 text-center">Acoes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaConvidados" class="divide-y divide-white/5"></tbody>
-                    </table>
-                </div>
             </div>
         </div>
 
@@ -631,9 +470,6 @@
             <div id="modalEscalaConteudo" class="space-y-6"></div>
 
             <div class="flex justify-end gap-3 pt-3 border-t border-white/10">
-                <button id="btnModalCarregarEscala" class="btn-glow text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square"></i> Carregar para o Painel e Editar
-                </button>
                 <button onclick="fecharModalEscala()" class="btn-secondary-custom text-xs font-bold px-6 py-3 rounded-xl">Fechar</button>
             </div>
         </div>
@@ -647,25 +483,8 @@
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
-        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v28')) || [
-            { id: '1', nome: 'Tati' },
-            { id: '2', nome: 'Ana' },
-            { id: '3', nome: 'Samuel' },
-            { id: '4', nome: 'Priscila' },
-            { id: '5', nome: 'Gabriel' }
-        ];
-
-        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v28')) || [
-            { id: '1', nome: 'Nara Julia' },
-            { id: '2', nome: 'Livia' },
-            { id: '3', nome: 'Elizama' },
-            { id: '4', nome: 'Salete' }
-        ];
-
         let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v28')) || [];
-        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v28')) || [];
         let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v28')) || [];
-        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v28') || null;
 
         let musicaAtualEmExibicao = null;
         let tomAtualTransposicao = 0;
@@ -707,31 +526,19 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('modo') === 'publico') {
                 ativarModoPublicoVisualizacao();
-            } else {
-                const hoje = new Date().toISOString().split('T')[0];
-                document.getElementById('dataCultoInput').value = hoje;
-                document.getElementById('tipoCultoInput').value = 'Culto de Domingo';
             }
 
-            atualizarTabelasPessoas();
             renderizarHistorico();
             renderizarListaCifras();
-            atualizarBalaoEscala();
         };
 
         function ativarModoPublicoVisualizacao() {
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             
-            // Ocultar abas de administracao e deixar visiveis apenas: Escalas Salvas, Novo Repertorio e Lista de Cifras
-            document.getElementById('tab-escala').classList.add('hidden');
-            document.getElementById('tab-pessoas').classList.add('hidden');
-            document.getElementById('tab-convidados').classList.add('hidden');
-
             document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
             document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas, cadastre novas musicas e acesse a lista de cifras.";
             
-            // Abrir diretamente na aba de Escalas Salvas
             mudarAba('historico');
         }
 
@@ -753,19 +560,13 @@
 
         function mudarAba(aba) {
             pararRolagem();
-            document.getElementById('conteudo-escala').classList.add('hidden');
             document.getElementById('conteudo-historico').classList.add('hidden');
             document.getElementById('conteudo-repertorio').classList.add('hidden');
             document.getElementById('conteudo-listacifras').classList.add('hidden');
-            document.getElementById('conteudo-pessoas').classList.add('hidden');
-            document.getElementById('conteudo-convidados').classList.add('hidden');
             
-            document.getElementById('tab-escala').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
             document.getElementById('tab-historico').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
             document.getElementById('tab-repertorio').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
             document.getElementById('tab-listacifras').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
-            document.getElementById('tab-pessoas').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
-            document.getElementById('tab-convidados').className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-secondary-custom flex items-center gap-2";
 
             document.getElementById(`conteudo-${aba}`).classList.remove('hidden');
             document.getElementById(`tab-${aba}`).className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2";
@@ -773,12 +574,8 @@
 
         function salvarTudo() {
             localStorage.setItem('igreja_banda_v28', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_cantores_v28', JSON.stringify(cantores));
-            localStorage.setItem('igreja_convidados_v28', JSON.stringify(convidados));
             localStorage.setItem('igreja_repertorio_v28', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_cultos_v28', JSON.stringify(cultos));
             localStorage.setItem('igreja_historico_v28', JSON.stringify(historicoEscalas));
-            localStorage.setItem('igreja_escala_ativa_titulo_v28', escalaAtivaTitulo || '');
             
             const status = document.getElementById('statusSalvar');
             if (status) {
@@ -786,23 +583,6 @@
                 status.className = "text-emerald-400 font-mono";
                 setTimeout(() => { status.innerText = "Dados guardados"; }, 2000);
             }
-        }
-
-        function atualizarBalaoEscala() {
-            const balao = document.getElementById('balaoEscalaAtiva');
-            const texto = document.getElementById('textoBalaoEscala');
-            if (!modoPublicoAtivo && escalaAtivaTitulo && cultos.length > 0) {
-                texto.innerText = escalaAtivaTitulo;
-                balao.classList.remove('hidden');
-            } else {
-                balao.classList.add('hidden');
-            }
-        }
-
-        function fecharBalaoEscala() {
-            escalaAtivaTitulo = null;
-            localStorage.removeItem('igreja_escala_ativa_titulo_v28');
-            document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
 
         function salvarNovaMusicaRepertorio(e) {
@@ -1080,6 +860,7 @@
 
         function renderizarListaCifras() {
             const container = document.getElementById('tabelaListaCifras');
+            if (!container) return;
             const termo = document.getElementById('inputPesquisaRepertorio').value.toLowerCase();
 
             const filtradas = repertorio.filter(r => 
@@ -1116,120 +897,6 @@
             `).join('');
         }
 
-        function adicionarBandaFixa(e) {
-            e.preventDefault();
-            const instrumento = document.getElementById('instrumentoNome').value.trim();
-            const musico = document.getElementById('musicoNome').value.trim();
-            if (!instrumento || !musico) return;
-            bandaFixa.push({ id: Date.now().toString(), instrumento, musico });
-            document.getElementById('instrumentoNome').value = '';
-            document.getElementById('musicoNome').value = '';
-            salvarTudo();
-            atualizarTabelasPessoas();
-        }
-
-        function removerBandaFixa(id) {
-            bandaFixa = bandaFixa.filter(b => b.id !== id);
-            salvarTudo();
-            atualizarTabelasPessoas();
-        }
-
-        function adicionarCantor(e) {
-            e.preventDefault();
-            const nome = document.getElementById('novoCantorNome').value.trim();
-            if (!nome) return;
-            cantores.push({ id: Date.now().toString(), nome });
-            document.getElementById('novoCantorNome').value = '';
-            salvarTudo();
-            atualizarTabelasPessoas();
-        }
-
-        function removerCantor(id) {
-            cantores = cantores.filter(c => c.id !== id);
-            salvarTudo();
-            atualizarTabelasPessoas();
-        }
-
-        function adicionarConvidado(e) {
-            e.preventDefault();
-            const nome = document.getElementById('novoConvidadoNome').value.trim();
-            if (!nome) return;
-            convidados.push({ id: Date.now().toString(), nome });
-            document.getElementById('novoConvidadoNome').value = '';
-            salvarTudo();
-            atualizarTabelasPessoas();
-        }
-
-        function removerConvidado(id) {
-            convidados = convidados.filter(c => c.id !== id);
-            salvarTudo();
-            atualizarTabelasPessoas();
-        }
-
-        function contarVezesNoMes(nome, dataCulto) {
-            if (!dataCulto) return 0;
-            const [ano, mes] = dataCulto.split('-');
-            let count = 0;
-            cultos.forEach(culto => {
-                if (culto.data && culto.data.startsWith(`${ano}-${mes}`)) {
-                    if (culto.momentos) culto.momentos.forEach(m => { if (m.ministro === nome) count++; });
-                }
-            });
-            historicoEscalas.forEach(hist => {
-                if (hist.cultos) {
-                    hist.cultos.forEach(culto => {
-                        if (culto.data && culto.data.startsWith(`${ano}-${mes}`)) {
-                            if (culto.momentos) hist.cultos.forEach(m => { if (m.ministro === nome) count++; });
-                        }
-                    });
-                }
-            });
-            return count;
-        }
-
-        function atualizarTabelasPessoas() {
-            const tbBanda = document.getElementById('tabelaBandaFixa');
-            if (tbBanda) {
-                tbBanda.innerHTML = bandaFixa.map(b => `
-                    <tr>
-                        <td class="py-3.5 px-2 font-bold">${b.instrumento}</td>
-                        <td class="py-3.5 px-2 text-muted-custom">${b.musico}</td>
-                        <td class="py-3.5 px-2 text-center"><button onclick="removerBandaFixa('${b.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
-                    </tr>
-                `).join('');
-            }
-
-            const tbCantores = document.getElementById('tabelaCantores');
-            if (tbCantores) {
-                tbCantores.innerHTML = cantores.map(c => {
-                    let total = 0;
-                    cultos.forEach(culto => { if (culto.momentos) culto.momentos.forEach(m => { if (m.ministro === c.nome) total++; }); });
-                    return `
-                        <tr>
-                            <td class="py-3.5 px-2 font-bold">${c.nome}</td>
-                            <td class="py-3.5 px-2 text-center font-mono">${total}</td>
-                            <td class="py-3.5 px-2 text-center"><button onclick="removerCantor('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-
-            const tbConvidados = document.getElementById('tabelaConvidados');
-            if (tbConvidados) {
-                tbConvidados.innerHTML = convidados.map(c => {
-                    const dataAtual = new Date().toISOString().split('T')[0];
-                    let totalMes = contarVezesNoMes(c.nome, dataAtual);
-                    return `
-                        <tr>
-                            <td class="py-3.5 px-2 font-bold">${c.nome}</td>
-                            <td class="py-3.5 px-2 text-center font-mono ${totalMes >= 1 ? 'text-amber-400 font-bold' : 'text-muted-custom'}">${totalMes} / 1</td>
-                            <td class="py-3.5 px-2 text-center"><button onclick="removerConvidado('${c.id}')" class="text-rose-400 hover:text-rose-300 p-2"><i class="fa-solid fa-trash-can"></i></button></td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-        }
-
         function verEscalaModal(id) {
             const hist = historicoEscalas.find(h => h.id === id);
             if (!hist) return;
@@ -1249,14 +916,6 @@
             }).join('');
 
             containerConteudo.innerHTML = htmlEscala;
-            
-            const btnCarregar = document.getElementById('btnModalCarregarEscala');
-            if (modoPublicoAtivo) {
-                btnCarregar.classList.add('hidden');
-            } else {
-                btnCarregar.classList.remove('hidden');
-            }
-            
             document.getElementById('modalVisualizarEscala').classList.remove('hidden');
         }
 
@@ -1294,7 +953,7 @@
         }
 
         function exportarBackup() {
-            const dados = { bandaFixa, cantores, convidados, repertorio, cultos, historicoEscalas, escalaAtivaTitulo };
+            const dados = { bandaFixa, repertorio, historicoEscalas };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -1312,17 +971,11 @@
                 try {
                     const dados = JSON.parse(e.target.result);
                     if (dados.bandaFixa) bandaFixa = dados.bandaFixa;
-                    if (dados.cantores) cantores = dados.cantores;
-                    if (dados.convidados) convidados = dados.convidados;
                     if (dados.repertorio) repertorio = dados.repertorio;
-                    if (dados.cultos) cultos = dados.cultos;
                     if (dados.historicoEscalas) historicoEscalas = dados.historicoEscalas;
-                    if (dados.escalaAtivaTitulo !== undefined) escalaAtivaTitulo = dados.escalaAtivaTitulo;
                     salvarTudo();
                     renderizarHistorico();
                     renderizarListaCifras();
-                    atualizarTabelasPessoas();
-                    atualizarBalaoEscala();
                     alert("Dados importados com sucesso!");
                 } catch (err) { alert("Erro ao ler o ficheiro de backup."); }
             };
