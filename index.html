@@ -124,20 +124,13 @@
         <div id="barraSuperiorAdmin" class="no-print card-custom p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-sm font-bold">
             <div class="flex items-center gap-3">
                 <div class="w-3.5 h-3.5 rounded-full animate-pulse" style="background-color: var(--accent-color);"></div>
-                <span class="text-muted-custom">Estado: <span id="statusSalvar" class="text-emerald-400 font-mono">Dados guardados</span></span>
+                <span class="text-muted-custom">Estado Firebase: <span id="statusSalvar" class="text-emerald-400 font-mono">A ligar...</span></span>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
                 <button onclick="copiarLinkPublico()" class="btn-glow px-4 py-2.5 rounded-xl flex items-center gap-2">
                     <i class="fa-solid fa-share-nodes"></i> Copiar Link para a Igreja
                 </button>
-                <button onclick="exportarBackup()" class="btn-secondary-custom px-4 py-2.5 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-down dynamic-accent"></i> Exportar Dados
-                </button>
-                <label class="btn-secondary-custom px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-cloud-arrow-up dynamic-accent"></i> Importar Dados
-                    <input type="file" id="inputImportar" accept=".json" onchange="importarBackup(event)" class="hidden">
-                </label>
 
                 <div class="h-5 w-px bg-white/15 hidden sm:block"></div>
 
@@ -167,7 +160,7 @@
                     <i class="fa-solid fa-church"></i> Ministerio de Louvor
                 </div>
                 <h1 id="tituloPrincipalApp" class="text-3xl sm:text-5xl font-black tracking-tight">Escalas & Repertorio</h1>
-                <p id="subtituloPrincipalApp" class="text-sm sm:text-base text-muted-custom font-medium max-w-xl">Gestao profissional de cultos, repertorio de musicas e arquivo por datas.</p>
+                <p id="subtituloPrincipalApp" class="text-sm sm:text-base text-muted-custom font-medium max-w-xl">Gestao profissional sincronizada em tempo real na nuvem.</p>
             </div>
             
             <div class="flex flex-wrap items-center gap-3 no-print w-full md:w-auto relative z-10">
@@ -284,9 +277,9 @@
             <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
                 <div class="space-y-1.5 border-b border-white/10 pb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
-                        <i class="fa-solid fa-folder-open"></i> Escalas Salvas e Arquivadas
+                        <i class="fa-solid fa-folder-open"></i> Escalas Salvas e Arquivadas na Nuvem
                     </h2>
-                    <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar todos os detalhes, ministros e louvores.</p>
+                    <p class="text-sm text-muted-custom">Clique em "Ver Escala" para consultar todos os detalhes, ministros e louvores atualizados.</p>
                 </div>
                 <div id="listaHistoricoDatas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
             </div>
@@ -294,7 +287,7 @@
 
     </div>
 
-    <!-- MODAL EDITAR CIFRA DO REPERTORIO -->
+    <!-- MODAL EDITAR CIFRA -->
     <div id="modalEditarCifra" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="card-custom p-6 sm:p-8 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto space-y-6 border border-white/10 relative">
             <div class="flex justify-between items-start border-b border-white/10 pb-4">
@@ -369,7 +362,7 @@
         </div>
     </div>
 
-    <!-- MODAL VISUALIZADOR DE CIFRA (MODO CIFRA CLUB REAL-TIME) -->
+    <!-- MODAL VISUALIZADOR DE CIFRA -->
     <div id="modalVisualizarCifra" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="card-custom p-5 sm:p-8 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col border border-white/10 relative overflow-hidden">
             
@@ -453,7 +446,7 @@
         </div>
     </div>
 
-    <!-- MODAL PARA VER ESCALA SALVA -->
+    <!-- MODAL VER ESCALA -->
     <div id="modalVisualizarEscala" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="card-custom p-6 sm:p-8 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto space-y-6 border border-white/10 relative">
             <div class="flex justify-between items-start border-b border-white/10 pb-4">
@@ -475,16 +468,32 @@
         </div>
     </div>
 
-    <script>
-        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v28')) || [
+    <!-- SCRIPT DE CONFIGURACAO E LOGICA DO FIREBASE (MODULAR) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt60CWL-466FxcmR9WSK0AnEu5NbXzas8",
+            authDomain: "escalas-igreja-e4f0f.firebaseapp.com",
+            projectId: "escalas-igreja-e4f0f",
+            storageBucket: "escalas-igreja-e4f0f.appspot.com",
+            messagingSenderId: "109197749598",
+            appId: "109197749598:web:a63fd53ee1f4db1cfa33cf"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let bandaFixa = [
             { id: '1', instrumento: 'Bateria', musico: 'Lucas' },
             { id: '2', instrumento: 'Baixo', musico: 'Matheus' },
             { id: '3', instrumento: 'Teclado', musico: 'Marcos' },
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
-        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v28')) || [];
-        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v28')) || [];
+        let repertorio = [];
+        let historicoEscalas = [];
 
         let musicaAtualEmExibicao = null;
         let tomAtualTransposicao = 0;
@@ -528,21 +537,18 @@
                 ativarModoPublicoVisualizacao();
             }
 
-            renderizarHistorico();
-            renderizarListaCifras();
+            ouvirDadosFirebase();
         };
 
         function ativarModoPublicoVisualizacao() {
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
-            
             document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
-            document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas, cadastre novas musicas e acesse a lista de cifras.";
-            
+            document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas e acesse a lista de cifras atualizada em tempo real.";
             mudarAba('historico');
         }
 
-        function copiarLinkPublico() {
+        window.copiarLinkPublico = function() {
             const linkBase = window.location.href.split('?')[0];
             const linkPublico = linkBase + '?modo=publico';
             navigator.clipboard.writeText(linkPublico).then(() => {
@@ -552,13 +558,13 @@
             });
         }
 
-        function mudarFundo(cor) {
+        window.mudarFundo = function(cor) {
             document.body.classList.remove('theme-bg-preto', 'theme-bg-crimson', 'theme-bg-midnight', 'theme-bg-lime', 'theme-bg-orange', 'theme-bg-neon', 'theme-bg-pink', 'theme-bg-branco');
             document.body.classList.add(`theme-bg-${cor}`);
             localStorage.setItem('igreja_theme_bg_v28', cor);
         }
 
-        function mudarAba(aba) {
+        window.mudarAba = function(aba) {
             pararRolagem();
             document.getElementById('conteudo-historico').classList.add('hidden');
             document.getElementById('conteudo-repertorio').classList.add('hidden');
@@ -572,20 +578,33 @@
             document.getElementById(`tab-${aba}`).className = "px-5 py-3.5 rounded-2xl text-sm font-extrabold btn-glow flex items-center gap-2";
         }
 
-        function salvarTudo() {
-            localStorage.setItem('igreja_banda_v28', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_repertorio_v28', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_historico_v28', JSON.stringify(historicoEscalas));
-            
-            const status = document.getElementById('statusSalvar');
-            if (status) {
-                status.innerText = "Dados guardados!";
-                status.className = "text-emerald-400 font-mono";
-                setTimeout(() => { status.innerText = "Dados guardados"; }, 2000);
-            }
+        function ouvirDadosFirebase() {
+            const statusEl = document.getElementById('statusSalvar');
+
+            onSnapshot(collection(db, "repertorio"), (snapshot) => {
+                repertorio = [];
+                snapshot.forEach((doc) => {
+                    repertorio.push({ id: doc.id, ...doc.data() });
+                });
+                renderizarListaCifras();
+                if (statusEl) statusEl.innerText = "Sincronizado na nuvem";
+            }, (error) => {
+                console.error("Erro ao sincronizar repertorio:", error);
+                if (statusEl) statusEl.innerText = "Erro na sincronização";
+            });
+
+            onSnapshot(collection(db, "historicoEscalas"), (snapshot) => {
+                historicoEscalas = [];
+                snapshot.forEach((doc) => {
+                    historicoEscalas.push({ id: doc.id, ...doc.data() });
+                });
+                renderizarHistorico();
+            }, (error) => {
+                console.error("Erro ao sincronizar escalas:", error);
+            });
         }
 
-        function salvarNovaMusicaRepertorio(e) {
+        window.salvarNovaMusicaRepertorio = async function(e) {
             e.preventDefault();
             const nome = document.getElementById('repNome').value.trim();
             const artista = document.getElementById('repArtista').value.trim();
@@ -598,25 +617,25 @@
 
             if (!nome || !artista || !tom) return;
 
-            repertorio.push({
-                id: 'rep_' + Date.now(),
-                nome, artista, tom, capotraste, ritmo, bpm, youtube, cifra
-            });
+            const novaMusica = { nome, artista, tom, capotraste, ritmo, bpm, youtube, cifra };
 
-            document.getElementById('repNome').value = '';
-            document.getElementById('repArtista').value = '';
-            document.getElementById('repTom').value = '';
-            document.getElementById('repBpm').value = '';
-            document.getElementById('repYoutube').value = '';
-            document.getElementById('repCifra').value = '';
+            try {
+                await addDoc(collection(db, "repertorio"), novaMusica);
+                document.getElementById('repNome').value = '';
+                document.getElementById('repArtista').value = '';
+                document.getElementById('repTom').value = '';
+                document.getElementById('repBpm').value = '';
+                document.getElementById('repYoutube').value = '';
+                document.getElementById('repCifra').value = '';
 
-            salvarTudo();
-            renderizarListaCifras();
-            alert("Musica salva no repertorio com sucesso!");
-            mudarAba('listacifras');
+                alert("Musica salva na nuvem com sucesso!");
+                mudarAba('listacifras');
+            } catch (error) {
+                alert("Erro ao salvar no Firebase: " + error.message);
+            }
         }
 
-        function abrirModalEditarCifra(id) {
+        window.abrirModalEditarCifra = function(id) {
             const musica = repertorio.find(r => r.id === id);
             if (!musica) return;
 
@@ -633,40 +652,45 @@
             document.getElementById('modalEditarCifra').classList.remove('hidden');
         }
 
-        function fecharModalEditarCifra() {
+        window.fecharModalEditarCifra = function() {
             document.getElementById('modalEditarCifra').classList.add('hidden');
         }
 
-        function salvarEdicaoCifra(e) {
+        window.salvarEdicaoCifra = async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const musica = repertorio.find(r => r.id === id);
-            if (!musica) return;
+            
+            const musicaAtualizada = {
+                nome: document.getElementById('editNome').value.trim(),
+                artista: document.getElementById('editArtista').value.trim(),
+                tom: document.getElementById('editTom').value.trim(),
+                capotraste: parseInt(document.getElementById('editCapotraste').value) || 0,
+                ritmo: document.getElementById('editRitmo').value.trim(),
+                bpm: document.getElementById('editBpm').value.trim(),
+                youtube: document.getElementById('editYoutube').value.trim(),
+                cifra: document.getElementById('editCifra').value.trim()
+            };
 
-            musica.nome = document.getElementById('editNome').value.trim();
-            musica.artista = document.getElementById('editArtista').value.trim();
-            musica.tom = document.getElementById('editTom').value.trim();
-            musica.capotraste = parseInt(document.getElementById('editCapotraste').value) || 0;
-            musica.ritmo = document.getElementById('editRitmo').value.trim();
-            musica.bpm = document.getElementById('editBpm').value.trim();
-            musica.youtube = document.getElementById('editYoutube').value.trim();
-            musica.cifra = document.getElementById('editCifra').value.trim();
-
-            salvarTudo();
-            renderizarListaCifras();
-            fecharModalEditarCifra();
-            alert("Musica atualizada com sucesso!");
-        }
-
-        function apagarMusicaRepertorio(id) {
-            if (confirm("Deseja apagar esta musica do repertorio?")) {
-                repertorio = repertorio.filter(r => r.id !== id);
-                salvarTudo();
-                renderizarListaCifras();
+            try {
+                await updateDoc(doc(db, "repertorio", id), musicaAtualizada);
+                fecharModalEditarCifra();
+                alert("Música atualizada na nuvem com sucesso!");
+            } catch (error) {
+                alert("Erro ao atualizar: " + error.message);
             }
         }
 
-        function verCifraModal(id) {
+        window.apagarMusicaRepertorio = async function(id) {
+            if (confirm("Deseja apagar esta musica da nuvem?")) {
+                try {
+                    await deleteDoc(doc(db, "repertorio", id));
+                } catch (error) {
+                    alert("Erro ao apagar: " + error.message);
+                }
+            }
+        }
+
+        window.verCifraModal = function(id) {
             const musica = repertorio.find(r => r.id === id);
             if (!musica) return;
 
@@ -679,12 +703,12 @@
             document.getElementById('modalVisualizarCifra').classList.remove('hidden');
         }
 
-        function fecharModalCifra() {
+        window.fecharModalCifra = function() {
             pararRolagem();
             document.getElementById('modalVisualizarCifra').classList.add('hidden');
         }
 
-        function mudarCapotrasteModal(valor) {
+        window.mudarCapotrasteModal = function(valor) {
             capoAtualModal = parseInt(valor);
             atualizarExibicaoModalCifra();
         }
@@ -769,7 +793,7 @@
             });
         }
 
-        function transporTom(delta) {
+        window.transporTom = function(delta) {
             tomAtualTransposicao += delta;
             atualizarExibicaoModalCifra();
         }
@@ -812,12 +836,8 @@
             container.innerHTML = htmlDiagramas;
         }
 
-        function toggleRolagem() {
-            if (rolandoAtivo) {
-                pararRolagem();
-            } else {
-                iniciarRolagem();
-            }
+        window.toggleRolagem = function() {
+            if (rolandoAtivo) { pararRolagem(); } else { iniciarRolagem(); }
         }
 
         function iniciarRolagem() {
@@ -836,7 +856,6 @@
                     corpo.scrollTop += pixelsParaMover;
                     acumuloPixelRolagem -= pixelsParaMover;
                 }
-
                 if (corpo.scrollTop + corpo.clientHeight >= corpo.scrollHeight - 2) {
                     pararRolagem();
                 }
@@ -853,7 +872,7 @@
             }
         }
 
-        function ajustarVelocidadeRolagem(delta) {
+        window.ajustarVelocidadeRolagem = function(delta) {
             velocidadeRolagem = Math.max(0.1, Math.min(5.0, Number((velocidadeRolagem + delta).toFixed(1))));
             document.getElementById('displayVelocidade').innerText = velocidadeRolagem.toFixed(1) + 'x';
         }
@@ -868,7 +887,7 @@
             );
 
             if (filtradas.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma musica encontrada.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma musica encontrada na nuvem.</div>`;
                 return;
             }
 
@@ -897,7 +916,7 @@
             `).join('');
         }
 
-        function verEscalaModal(id) {
+        window.verEscalaModal = function(id) {
             const hist = historicoEscalas.find(h => h.id === id);
             if (!hist) return;
             document.getElementById('modalEscalaTitulo').innerText = hist.tituloResumo;
@@ -919,13 +938,15 @@
             document.getElementById('modalVisualizarEscala').classList.remove('hidden');
         }
 
-        function fecharModalEscala() { document.getElementById('modalVisualizarEscala').classList.add('hidden'); }
+        window.fecharModalEscala = function() { document.getElementById('modalVisualizarEscala').classList.add('hidden'); }
 
-        function apagarHistorico(id) {
-            if (confirm("Deseja apagar esta escala salva?")) {
-                historicoEscalas = historicoEscalas.filter(h => h.id !== id);
-                salvarTudo();
-                renderizarHistorico();
+        window.apagarHistorico = async function(id) {
+            if (confirm("Deseja apagar esta escala da nuvem?")) {
+                try {
+                    await deleteDoc(doc(db, "historicoEscalas", id));
+                } catch (error) {
+                    alert("Erro ao apagar escala: " + error.message);
+                }
             }
         }
 
@@ -933,7 +954,7 @@
             const container = document.getElementById('listaHistoricoDatas');
             if (!container) return;
             if (historicoEscalas.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma escala salva no momento.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma escala salva na nuvem no momento.</div>`;
                 return;
             }
             container.innerHTML = historicoEscalas.map(hist => `
@@ -950,36 +971,6 @@
                     </div>
                 </div>
             `).join('');
-        }
-
-        function exportarBackup() {
-            const dados = { bandaFixa, repertorio, historicoEscalas };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "backup_escala_igreja.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importarBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const dados = JSON.parse(e.target.result);
-                    if (dados.bandaFixa) bandaFixa = dados.bandaFixa;
-                    if (dados.repertorio) repertorio = dados.repertorio;
-                    if (dados.historicoEscalas) historicoEscalas = dados.historicoEscalas;
-                    salvarTudo();
-                    renderizarHistorico();
-                    renderizarListaCifras();
-                    alert("Dados importados com sucesso!");
-                } catch (err) { alert("Erro ao ler o ficheiro de backup."); }
-            };
-            reader.readAsText(file);
         }
     </script>
 </body>
