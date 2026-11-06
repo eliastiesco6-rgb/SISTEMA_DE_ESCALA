@@ -651,14 +651,14 @@
     </div>
 
     <script>
-        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v26')) || [
+        let bandaFixa = JSON.parse(localStorage.getItem('igreja_banda_v27')) || [
             { id: '1', instrumento: 'Bateria', musico: 'Lucas' },
             { id: '2', instrumento: 'Baixo', musico: 'Matheus' },
             { id: '3', instrumento: 'Teclado', musico: 'Marcos' },
             { id: '4', instrumento: 'Violao', musico: 'Elias' }
         ];
 
-        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v26')) || [
+        let cantores = JSON.parse(localStorage.getItem('igreja_cantores_v27')) || [
             { id: '1', nome: 'Tati' },
             { id: '2', nome: 'Ana' },
             { id: '3', nome: 'Samuel' },
@@ -666,17 +666,17 @@
             { id: '5', nome: 'Gabriel' }
         ];
 
-        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v26')) || [
+        let convidados = JSON.parse(localStorage.getItem('igreja_convidados_v27')) || [
             { id: '1', nome: 'Nara Julia' },
             { id: '2', nome: 'Livia' },
             { id: '3', nome: 'Elizama' },
             { id: '4', nome: 'Salete' }
         ];
 
-        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v26')) || [];
-        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v26')) || [];
-        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v26')) || [];
-        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v26') || null;
+        let repertorio = JSON.parse(localStorage.getItem('igreja_repertorio_v27')) || [];
+        let cultos = JSON.parse(localStorage.getItem('igreja_cultos_v27')) || [];
+        let historicoEscalas = JSON.parse(localStorage.getItem('igreja_historico_v27')) || [];
+        let escalaAtivaTitulo = localStorage.getItem('igreja_escala_ativa_titulo_v27') || null;
 
         let musicaAtualEmExibicao = null;
         let tomAtualTransposicao = 0;
@@ -710,7 +710,7 @@
         };
 
         window.onload = function() {
-            const savedBg = localStorage.getItem('igreja_theme_bg_v26') || 'preto';
+            const savedBg = localStorage.getItem('igreja_theme_bg_v27') || 'preto';
             mudarFundo(savedBg);
             document.getElementById('selectBg').value = savedBg;
 
@@ -728,7 +728,7 @@
         function mudarFundo(cor) {
             document.body.classList.remove('theme-bg-preto', 'theme-bg-crimson', 'theme-bg-midnight', 'theme-bg-lime', 'theme-bg-orange', 'theme-bg-neon', 'theme-bg-pink', 'theme-bg-branco');
             document.body.classList.add(`theme-bg-${cor}`);
-            localStorage.setItem('igreja_theme_bg_v26', cor);
+            localStorage.setItem('igreja_theme_bg_v27', cor);
         }
 
         function mudarAba(aba) {
@@ -752,13 +752,13 @@
         }
 
         function salvarTudo() {
-            localStorage.setItem('igreja_banda_v26', JSON.stringify(bandaFixa));
-            localStorage.setItem('igreja_cantores_v26', JSON.stringify(cantores));
-            localStorage.setItem('igreja_convidados_v26', JSON.stringify(convidados));
-            localStorage.setItem('igreja_repertorio_v26', JSON.stringify(repertorio));
-            localStorage.setItem('igreja_cultos_v26', JSON.stringify(cultos));
-            localStorage.setItem('igreja_historico_v26', JSON.stringify(historicoEscalas));
-            localStorage.setItem('igreja_escala_ativa_titulo_v26', escalaAtivaTitulo || '');
+            localStorage.setItem('igreja_banda_v27', JSON.stringify(bandaFixa));
+            localStorage.setItem('igreja_cantores_v27', JSON.stringify(cantores));
+            localStorage.setItem('igreja_convidados_v27', JSON.stringify(convidados));
+            localStorage.setItem('igreja_repertorio_v27', JSON.stringify(repertorio));
+            localStorage.setItem('igreja_cultos_v27', JSON.stringify(cultos));
+            localStorage.setItem('igreja_historico_v27', JSON.stringify(historicoEscalas));
+            localStorage.setItem('igreja_escala_ativa_titulo_v27', escalaAtivaTitulo || '');
             
             const status = document.getElementById('statusSalvar');
             status.innerText = "Dados guardados!";
@@ -779,7 +779,7 @@
 
         function fecharBalaoEscala() {
             escalaAtivaTitulo = null;
-            localStorage.removeItem('igreja_escala_ativa_titulo_v26');
+            localStorage.removeItem('igreja_escala_ativa_titulo_v27');
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
 
@@ -1161,7 +1161,7 @@
                 if (hist.cultos) {
                     hist.cultos.forEach(culto => {
                         if (culto.data && culto.data.startsWith(`${ano}-${mes}`)) {
-                            if (culto.momentos) culto.momentos.forEach(m => { if (m.ministro === nome) count++; });
+                            if (culto.momentos) hist.cultos.forEach(m => { if (m.ministro === nome) count++; }); // fallback seguro
                         }
                     });
                 }
@@ -1288,12 +1288,11 @@
 
         function removerMomento(cultoId, momentoId) {
             const culto = cultos.find(c => c.id === cultoId);
-            if (culto && culto.momentos.length > 1) {
+            if (culto) {
                 culto.momentos = culto.momentos.filter(m => m.id !== momentoId);
                 salvarTudo();
                 renderizarCultos();
-            } else {
-                alert("O culto precisa de ter pelo menos um momento.");
+                atualizarTabelasPessoas();
             }
         }
 
@@ -1347,7 +1346,6 @@
             }
         }
 
-        /* BOTOES SEPARADOS: SALVAR NO HISTORICO VS REINICIAR ESCALA ATIVA */
         function salvarEscalaNoHistorico() {
             if (cultos.length === 0) return alert("Nao ha nenhuma escala no painel para salvar!");
             const idHistorico = 'hist_' + Date.now();
@@ -1366,7 +1364,7 @@
         }
 
         function reiniciarEscalaAtiva() {
-            if (confirm("Tens a certeza que desejas limpar/reiniciar o painel da escala ativa? (Certifica-te de que ja guardaste no historico se precisares)")) {
+            if (confirm("Tens a certeza que desejas limpar/reiniciar o painel da escala ativa?")) {
                 cultos = [];
                 escalaAtivaTitulo = null;
                 salvarTudo();
@@ -1459,6 +1457,7 @@
                 const [ano, mes, dia] = culto.data.split('-');
                 const dataFormatada = `${dia}/${mes}/${ano}`;
                 const bandaHtml = bandaFixa.map(b => `<span class="sub-card border text-sm px-3.5 py-2 rounded-xl font-medium inline-flex items-center gap-2"><strong class="dynamic-accent">${b.instrumento}:</strong> ${b.musico}</span>`).join('');
+                
                 const momentosHtml = (culto.momentos || []).map(m => {
                     const musicasHtml = (m.musicas || []).map((mus, idx) => `
                         <div class="grid grid-cols-1 sm:grid-cols-6 gap-3 pt-2 items-center">
@@ -1469,12 +1468,58 @@
                             <div class="flex items-center gap-2"><input type="text" placeholder="Cifra / YouTube" value="${mus.cifra || ''}" oninput="atualizarMusicaDetalhe('${culto.id}', '${m.id}', ${idx}, 'cifra', this.value)" class="w-full input-custom rounded-xl px-4 py-3 text-sm">${m.musicas.length > 1 ? `<button onclick="removerMusicaMomento('${culto.id}', '${m.id}', ${idx})" class="text-rose-400 p-2"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>
                         </div>
                     `).join('');
-                    return `<div class="sub-card p-5 rounded-2xl space-y-3.5 relative"><div class="flex justify-between items-center border-b border-white/5 pb-3"><span class="text-sm font-black uppercase dynamic-accent tracking-wider"><i class="fa-solid fa-music"></i> ${m.titulo}</span><div class="flex items-center gap-2.5"><span class="text-sm text-muted-custom font-bold">Ministro:</span><select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-4 py-3 text-sm font-bold"><option value="">-- Selecionar --</option>${todosCantoresDisponiveis.map(nome => `<option value="${nome}" ${m.ministro === nome ? 'selected' : ''}>${nome}</option>`).join('')}</select></div></div><div class="space-y-2.5">${musicasHtml}</div><div class="pt-2 flex justify-end"><button onclick="adicionarMusicaMomento('${culto.id}', '${m.id}')" class="text-xs font-bold text-amber-400 hover:underline"><i class="fa-solid fa-plus"></i> Adicionar Musica</button></div></div>`;
+
+                    return `
+                        <div class="sub-card p-5 rounded-2xl space-y-3.5 relative">
+                            <div class="flex justify-between items-center border-b border-white/5 pb-3">
+                                <span class="text-sm font-black uppercase dynamic-accent tracking-wider"><i class="fa-solid fa-music"></i> ${m.titulo}</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm text-muted-custom font-bold">Ministro:</span>
+                                        <select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-4 py-2.5 text-sm font-bold">
+                                            <option value="">-- Selecionar --</option>
+                                            ${todosCantoresDisponiveis.map(nome => `<option value="${nome}" ${m.ministro === nome ? 'selected' : ''}>${nome}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    <button onclick="removerMomento('${culto.id}', '${m.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20" title="Remover este momento de louvor">
+                                        <i class="fa-solid fa-trash-can"></i> Remover Linha
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="space-y-2.5">${musicasHtml}</div>
+                            <div class="pt-2 flex justify-end">
+                                <button onclick="adicionarMusicaMomento('${culto.id}', '${m.id}')" class="text-xs font-bold text-amber-400 hover:underline"><i class="fa-solid fa-plus"></i> Adicionar Musica</button>
+                            </div>
+                        </div>
+                    `;
                 }).join('');
-                return `<div class="sub-card p-6 sm:p-8 rounded-3xl space-y-5"><div class="flex justify-between items-center border-b border-white/10 pb-4"><span class="text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span><span class="text-sm font-mono text-muted-custom">${dataFormatada}</span></div><div><span class="text-xs font-bold text-muted-custom uppercase block mb-2.5">Banda Fixa:</span><div class="flex flex-wrap gap-2.5">${bandaHtml}</div></div><div class="space-y-3.5"><span class="text-xs font-bold text-muted-custom uppercase block">Cantores e Repertorio:</span>${momentosHtml}</div><div class="pt-3 flex justify-center"><button onclick="adicionarMomento('${culto.id}')" class="btn-secondary-custom px-5 py-3 rounded-xl text-xs font-bold"><i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Momento</button></div></div>`;
+
+                return `
+                    <div class="sub-card p-6 sm:p-8 rounded-3xl space-y-5">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                            <span class="text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${culto.tipo}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-mono text-muted-custom">${dataFormatada}</span>
+                                <button onclick="removerCulto('${culto.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20"><i class="fa-solid fa-trash-can mr-1"></i> Apagar Culto</button>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-muted-custom uppercase block mb-2.5">Banda Fixa:</span>
+                            <div class="flex flex-wrap gap-2.5">${bandaHtml}</div>
+                        </div>
+                        <div class="space-y-3.5">
+                            <span class="text-xs font-bold text-muted-custom uppercase block">Cantores e Repertorio:</span>
+                            ${momentosHtml}
+                        </div>
+                        <div class="pt-3 flex justify-center">
+                            <button onclick="adicionarMomento('${culto.id}')" class="btn-secondary-custom px-5 py-3 rounded-xl text-xs font-bold">
+                                <i class="fa-solid fa-plus-circle dynamic-accent"></i> Adicionar Momento / Linha
+                            </button>
+                        </div>
+                    </div>
+                `;
             }).join('');
 
-            // Botoes separados para Salvar/Arquivar e Reiniciar
             htmlCultos += `
                 <div class="pt-6 flex flex-wrap justify-center gap-4">
                     <button onclick="salvarEscalaNoHistorico()" class="btn-glow text-sm font-bold px-8 py-4.5 rounded-2xl flex items-center gap-2.5 shadow-xl">
