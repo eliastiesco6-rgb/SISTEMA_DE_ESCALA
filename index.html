@@ -139,7 +139,6 @@
         window.firebaseOnSnapshot = onSnapshot;
         window.firebaseReady = true;
 
-        // Disparar evento quando o Firebase estiver pronto para carregar os dados da nuvem
         window.dispatchEvent(new Event('firebase-loaded'));
     </script>
 </head>
@@ -227,7 +226,7 @@
         </div>
 
         <!-- CONTEUDO: ESCALA ATIVA -->
-        <div id="conteudo-escala" class="space-y-6 hidden">
+        <div id="conteudo-escala" class="space-y-6">
             <div id="balaoEscalaAtiva" class="hidden card-custom p-5 rounded-2xl border flex items-center justify-between gap-4" style="border-color: var(--accent-color); background-color: var(--accent-glow);">
                 <div class="flex items-center gap-3">
                     <i class="fa-solid fa-circle-info text-xl dynamic-accent"></i>
@@ -281,7 +280,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-5">
                     <div>
                         <h2 id="tituloPainelEscalaAtual" class="text-xl sm:text-2xl font-black tracking-tight">Painel da Escala Atual</h2>
-                        <p id="subtituloPainelEscalaAtual" class="text-sm text-muted-custom">Preencha os dados e utilize os botoes abaixo para salvar no historico ou reiniciar.</p>
+                        <p id="subtituloPainelEscalaAtual" class="text-sm text-muted-custom">Preencha os dados e utilize os botões abaixo para salvar no histórico ou reiniciar.</p>
                     </div>
                 </div>
                 <div id="listaCultos" class="space-y-6"></div>
@@ -378,7 +377,7 @@
         </div>
 
         <!-- CONTEUDO: HISTORICO -->
-        <div id="conteudo-historico" class="space-y-6">
+        <div id="conteudo-historico" class="space-y-6 hidden">
             <div class="card-custom p-6 sm:p-8 rounded-3xl space-y-5">
                 <div class="space-y-1.5 border-b border-white/10 pb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 dynamic-accent">
@@ -557,7 +556,7 @@
         </div>
     </div>
 
-    <!-- MODAL VISUALIZADOR DE CIFRA (MODO CIFRA CLUB REAL-TIME) -->
+    <!-- MODAL VISUALIZADOR DE CIFRA -->
     <div id="modalVisualizarCifra" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 hidden">
         <div class="card-custom p-5 sm:p-8 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col border border-white/10 relative overflow-hidden">
             
@@ -728,7 +727,6 @@
 
         // --- SINCRONIZAÇÃO COM O FIREBASE FIRESTORE ---
         async function salvarTudo() {
-            // Salva no localStorage (cache local imediato)
             localStorage.setItem('igreja_banda_v28', JSON.stringify(bandaFixa));
             localStorage.setItem('igreja_cantores_v28', JSON.stringify(cantores));
             localStorage.setItem('igreja_convidados_v28', JSON.stringify(convidados));
@@ -743,7 +741,6 @@
                 status.className = "text-amber-400 font-mono";
             }
 
-            // Salva no Firestore (Nuvem) para atualizar o link público em tempo real
             if (window.firebaseReady && window.db) {
                 try {
                     const dadosCloud = { bandaFixa, cantores, convidados, repertorio, cultos, historicoEscalas, escalaAtivaTitulo };
@@ -763,7 +760,6 @@
             }
         }
 
-        // Ouvir atualizações da nuvem automaticamente (Real-time sync)
         window.addEventListener('firebase-loaded', () => {
             if (window.db && window.firebaseDoc && window.firebaseOnSnapshot) {
                 const docRef = window.firebaseDoc(window.db, "sistema", "dados_igreja");
@@ -778,10 +774,10 @@
                         if (dados.historicoEscalas) historicoEscalas = dados.historicoEscalas;
                         if (dados.escalaAtivaTitulo !== undefined) escalaAtivaTitulo = dados.escalaAtivaTitulo;
 
-                        // Atualiza a interface em tempo real
                         atualizarTabelasPessoas();
                         renderizarHistorico();
                         renderizarListaCifras();
+                        renderizarCultos();
                         atualizarBalaoEscala();
                     }
                 });
@@ -806,6 +802,7 @@
             atualizarTabelasPessoas();
             renderizarHistorico();
             renderizarListaCifras();
+            renderizarCultos();
             atualizarBalaoEscala();
         };
 
@@ -875,6 +872,238 @@
             localStorage.removeItem('igreja_escala_ativa_titulo_v28');
             document.getElementById('balaoEscalaAtiva').classList.add('hidden');
         }
+
+        // --- GESTÃO DA ESCALA ATIVA E MOMENTOS ---
+        function gerarEscalaAutomatica() {
+            const data = document.getElementById('dataCultoInput').value;
+            const tipo = document.getElementById('tipoCultoInput').value.trim() || 'Culto de Domingo';
+            if (!data) {
+                alert("Selecione a data do culto.");
+                return;
+            }
+
+            // Selecionar cantores oficiais e convidados respeitando o limite
+            const listaMinistrosDisponiveis = [...cantores.map(c => c.nome), ...convidados.map(c => c.nome)];
+            if (listaMinistrosDisponiveis.length === 0) {
+                alert("Cadastre cantores ou convidados primeiro na aba 'Banda e Cantores' ou 'Convidados'.");
+                return;
+            }
+
+            const ministro1 = listaMinistrosDisponiveis[Math.floor(Math.random() * listaMinistrosDisponiveis.length)];
+            const ministro2 = listaMinistrosDisponiveis[Math.floor(Math.random() * listaMinistrosDisponiveis.length)];
+
+            const novoCulto = {
+                id: Date.now().toString(),
+                data,
+                tipo,
+                momentos: [
+                    {
+                        id: '1',
+                        titulo: 'LOUVOR DA HARPA',
+                        ministro: ministro1,
+                        musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }]
+                    },
+                    {
+                        id: '2',
+                        titulo: 'LOUVOR DA OFERTA',
+                        ministro: ministro2,
+                        musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }]
+                    }
+                ]
+            };
+
+            cultos = [novoCulto];
+            escalaAtivaTitulo = `${data.split('-').reverse().join('/')} (${tipo})`;
+            salvarTudo();
+            renderizarCultos();
+            atualizarBalaoEscala();
+            alert("Escala gerada automaticamente com sucesso!");
+        }
+
+        function adicionarCultoManual() {
+            const data = document.getElementById('dataCultoInput').value;
+            const tipo = document.getElementById('tipoCultoInput').value.trim() || 'Culto de Domingo';
+            if (!data) {
+                alert("Selecione a data do culto.");
+                return;
+            }
+
+            const novoCulto = {
+                id: Date.now().toString(),
+                data,
+                tipo,
+                momentos: [
+                    {
+                        id: '1',
+                        titulo: 'LOUVOR DA HARPA',
+                        ministro: cantores[0]?.nome || '',
+                        musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }]
+                    }
+                ]
+            };
+
+            cultos.push(novoCulto);
+            escalaAtivaTitulo = `${data.split('-').reverse().join('/')} (${tipo})`;
+            salvarTudo();
+            renderizarCultos();
+            atualizarBalaoEscala();
+        }
+
+        function adicionarMusicaMomento(cultoId, momentoId) {
+            const culto = cultos.find(c => c.id === cultoId);
+            if (!culto) return;
+            const momento = culto.momentos.find(m => m.id === momentoId);
+            if (!momento) return;
+
+            momento.musicas.push({ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' });
+            salvarTudo();
+            renderizarCultos();
+        }
+
+        function removerMusicaMomento(cultoId, momentoId, index) {
+            const culto = cultos.find(c => c.id === cultoId);
+            if (!culto) return;
+            const momento = culto.momentos.find(m => m.id === momentoId);
+            if (!momento) return;
+
+            momento.musicas.splice(index, 1);
+            salvarTudo();
+            renderizarCultos();
+        }
+
+        function atualizarCampoMusica(cultoId, momentoId, index, campo, valor) {
+            const culto = cultos.find(c => c.id === cultoId);
+            if (!culto) return;
+            const momento = culto.momentos.find(m => m.id === momentoId);
+            if (!momento) return;
+            if (momento.musicas[index]) {
+                momento.musicas[index][campo] = valor;
+                salvarTudo();
+            }
+        }
+
+        function atualizarMinistroMomento(cultoId, momentoId, ministro) {
+            const culto = cultos.find(c => c.id === cultoId);
+            if (!culto) return;
+            const momento = culto.momentos.find(m => m.id === momentoId);
+            if (!momento) return;
+            momento.ministro = ministro;
+            salvarTudo();
+        }
+
+        function salvarEscalaNoHistorico() {
+            if (cultos.length === 0) {
+                alert("Não há nenhuma escala ativa para salvar.");
+                return;
+            }
+
+            const dataCriacao = new Date().toLocaleDateString('pt-BR');
+            const primeiroCulto = cultos[0];
+            const tituloResumo = `${primeiroCulto.data.split('-').reverse().join('/')} (${primeiroCulto.tipo})`;
+
+            const novaHistorico = {
+                id: 'hist_' + Date.now(),
+                tituloResumo,
+                dataCriacao,
+                cultos: JSON.parse(JSON.stringify(cultos))
+            };
+
+            historicoEscalas.unshift(novaHistorico);
+            salvarTudo();
+            renderizarHistorico();
+            alert("Escala salva no histórico com sucesso!");
+            mudarAba('historico');
+        }
+
+        function reiniciarEscalaAtual() {
+            if (confirm("Deseja reiniciar/limpar a escala atual?")) {
+                cultos = [];
+                escalaAtivaTitulo = null;
+                salvarTudo();
+                renderizarCultos();
+                atualizarBalaoEscala();
+            }
+        }
+
+        function renderizarCultos() {
+            const container = document.getElementById('listaCultos');
+            if (!container) return;
+
+            if (cultos.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-muted-custom text-sm italic">Nenhuma escala ativa no momento. Crie uma nova escala acima.</div>`;
+                return;
+            }
+
+            const todosCantoresEMinistros = [...cantores, ...convidados];
+
+            container.innerHTML = cultos.map(culto => {
+                const momentosHtml = culto.momentos.map(m => {
+                    const musicasHtml = m.musicas.map((mus, idx) => `
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center pt-2">
+                            <div class="sm:col-span-5">
+                                <input type="text" value="${mus.musica}" oninput="atualizarCampoMusica('${culto.id}', '${m.id}', ${idx}, 'musica', this.value)" placeholder="Nome da Musica" class="w-full input-custom rounded-xl px-4 py-3 text-sm">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <input type="text" value="${mus.tom}" oninput="atualizarCampoMusica('${culto.id}', '${m.id}', ${idx}, 'tom', this.value)" placeholder="Tom" class="w-full input-custom rounded-xl px-4 py-3 text-sm text-center font-bold">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <input type="text" value="${mus.ritmo}" oninput="atualizarCampoMusica('${culto.id}', '${m.id}', ${idx}, 'ritmo', this.value)" placeholder="Ritmo" class="w-full input-custom rounded-xl px-4 py-3 text-sm">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <input type="text" value="${mus.cifra}" oninput="atualizarCampoMusica('${culto.id}', '${m.id}', ${idx}, 'cifra', this.value)" placeholder="Cifra / YouTube" class="w-full input-custom rounded-xl px-4 py-3 text-sm">
+                            </div>
+                            <div class="sm:col-span-1 text-center">
+                                <button onclick="removerMusicaMomento('${culto.id}', '${m.id}', ${idx})" class="text-rose-400 hover:text-rose-300 p-2" title="Remover Música"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    const opcoesMinistros = todosCantoresEMinistros.map(c => `<option value="${c.nome}" ${m.ministro === c.nome ? 'selected' : ''}>${c.nome}</option>`).join('');
+
+                    return `
+                        <div class="sub-card p-5 rounded-3xl space-y-4 border border-white/10">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-4">
+                                <h3 class="text-base font-black dynamic-accent flex items-center gap-2">
+                                    <i class="fa-solid fa-music"></i> ${m.titulo}
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs font-bold text-muted-custom">Ministro:</label>
+                                    <select onchange="atualizarMinistroMomento('${culto.id}', '${m.id}', this.value)" class="input-custom rounded-xl px-3 py-2 text-xs font-bold cursor-pointer">
+                                        <option value="">Selecione o Ministro</option>
+                                        ${opcoesMinistros}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                ${musicasHtml}
+                            </div>
+                            <div class="pt-2 flex justify-end">
+                                <button onclick="adicionarMusicaMomento('${culto.id}', '${m.id}')" class="text-xs font-bold dynamic-accent hover:underline flex items-center gap-1.5 py-1 px-3 rounded-lg bg-black/30 border border-white/10">
+                                    <i class="fa-solid fa-plus"></i> Adicionar Musica
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="space-y-6">
+                        <div class="space-y-4">
+                            ${momentosHtml}
+                        </div>
+                        <div class="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-white/10">
+                            <button onclick="reiniciarEscalaAtual()" class="btn-secondary-custom text-xs font-bold px-6 py-3.5 rounded-xl flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-right"></i> Reiniciar Lista
+                            </button>
+                            <button onclick="salvarEscalaNoHistorico()" class="btn-glow text-xs font-bold px-8 py-3.5 rounded-xl flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Histórico
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        // ---------------------------------------------
 
         function salvarNovaMusicaRepertorio(e) {
             e.preventDefault();
@@ -1392,6 +1621,7 @@
                     salvarTudo();
                     renderizarHistorico();
                     renderizarListaCifras();
+                    renderizarCultos();
                     atualizarTabelasPessoas();
                     atualizarBalaoEscala();
                     alert("Dados importados com sucesso!");
