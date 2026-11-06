@@ -714,7 +714,6 @@
             }
 
             atualizarTabelasPessoas();
-            renderizarCultos();
             renderizarHistorico();
             renderizarListaCifras();
             atualizarBalaoEscala();
@@ -724,16 +723,15 @@
             modoPublicoAtivo = true;
             document.getElementById('barraSuperiorAdmin').classList.add('hidden');
             
-            // Ocultar abas de administracao pura, mantendo apenas Escalas Salvas e Lista de Cifras visiveis para a igreja
+            // Ocultar abas de administracao e deixar visiveis apenas: Escalas Salvas, Novo Repertorio e Lista de Cifras
             document.getElementById('tab-escala').classList.add('hidden');
-            document.getElementById('tab-repertorio').classList.add('hidden');
             document.getElementById('tab-pessoas').classList.add('hidden');
             document.getElementById('tab-convidados').classList.add('hidden');
 
             document.getElementById('tituloPrincipalApp').innerText = "Escalas de Louvor";
-            document.getElementById('subtituloPrincipalApp').innerText = "Consulte todas as escalas salvas, ministros e louvores programados.";
+            document.getElementById('subtituloPrincipalApp').innerText = "Consulte as escalas salvas, cadastre novas musicas e acesse a lista de cifras.";
             
-            // Mudar automaticamente para a aba de Historico (Escalas Salvas) ao abrir o link publico
+            // Abrir diretamente na aba de Escalas Salvas
             mudarAba('historico');
         }
 
@@ -1219,7 +1217,7 @@
             const tbConvidados = document.getElementById('tabelaConvidados');
             if (tbConvidados) {
                 tbConvidados.innerHTML = convidados.map(c => {
-                    const dataAtual = document.getElementById('dataCultoInput') ? document.getElementById('dataCultoInput').value : new Date().toISOString().split('T')[0];
+                    const dataAtual = new Date().toISOString().split('T')[0];
                     let totalMes = contarVezesNoMes(c.nome, dataAtual);
                     return `
                         <tr>
@@ -1229,189 +1227,6 @@
                         </tr>
                     `;
                 }).join('');
-            }
-        }
-
-        function adicionarCultoManual() {
-            const data = document.getElementById('dataCultoInput').value;
-            const tipo = document.getElementById('tipoCultoInput').value.trim() || 'Culto';
-            if (!data) return alert("Selecione uma data valida!");
-
-            cultos.push({
-                id: Date.now().toString(), data, tipo,
-                momentos: [
-                    { id: '1', titulo: 'LOUVOR DA HARPA', ministro: '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
-                    { id: '2', titulo: 'LOUVOR DA OFERTA', ministro: '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
-                    { id: '3', titulo: 'LOUVOR CONGREGACIONAL', ministro: '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] }
-                ]
-            });
-            salvarTudo();
-            renderizarCultos();
-            atualizarTabelasPessoas();
-        }
-
-        function gerarEscalaAutomatica() {
-            const data = document.getElementById('dataCultoInput').value;
-            const tipo = document.getElementById('tipoCultoInput').value.trim() || 'Culto';
-            if (!data) return alert("Selecione uma data valida!");
-            if (cantores.length === 0) return alert("Cadastre pelo menos 1 cantor oficial para a Harpa.");
-
-            let ultimosMinistros = [];
-            if (cultos.length > 0) {
-                const ultimo = cultos[cultos.length - 1];
-                if (ultimo.momentos) ultimosMinistros = ultimo.momentos.map(m => m.ministro);
-            }
-
-            let poolOficiais = [...cantores.map(c => c.nome)].sort(() => Math.random() - 0.5);
-            let convidadosDisponiveis = convidados.filter(cv => contarVezesNoMes(cv.nome, data) === 0).map(cv => cv.nome).sort(() => Math.random() - 0.5);
-
-            let oficiaisFiltradosHarpa = poolOficiais.filter(c => !ultimosMinistros.includes(c));
-            if (oficiaisFiltradosHarpa.length === 0) oficiaisFiltradosHarpa = poolOficiais;
-            let ministroHarpa = oficiaisFiltradosHarpa[0] || poolOficiais[0];
-
-            let escolhidosOutros = [];
-            if (convidadosDisponiveis.length > 0) {
-                escolhidosOutros.push(convidadosDisponiveis[0]);
-            }
-            
-            for (let c of poolOficiais) {
-                if (c !== ministroHarpa && escolhidosOutros.length < 2 && !escolhidosOutros.includes(c)) {
-                    escolhidosOutros.push(c);
-                }
-            }
-            for (let c of poolOficiais) {
-                if (escolhidosOutros.length < 2 && !escolhidosOutros.includes(c)) {
-                    escolhidosOutros.push(c);
-                }
-            }
-
-            cultos.push({
-                id: Date.now().toString(), data, tipo,
-                momentos: [
-                    { id: '1', titulo: 'LOUVOR DA HARPA', ministro: ministroHarpa, musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
-                    { id: '2', titulo: 'LOUVOR DA OFERTA', ministro: escolhidosOutros[0] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] },
-                    { id: '3', titulo: 'LOUVOR CONGREGACIONAL', ministro: escolhidosOutros[1] || '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] }
-                ]
-            });
-
-            salvarTudo();
-            renderizarCultos();
-            atualizarTabelasPessoas();
-            alert("Escala gerada com sucesso!");
-        }
-
-        function adicionarMomento(cultoId) {
-            const culto = cultos.find(c => c.id === cultoId);
-            if (culto) {
-                const nomeMomento = prompt("Nome do novo bloco de louvor:", "LOUVOR ESPECIAL");
-                if (!nomeMomento) return;
-                if (!culto.momentos) culto.momentos = [];
-                culto.momentos.push({ id: Date.now().toString(), titulo: nomeMomento.toUpperCase(), ministro: '', musicas: [{ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' }] });
-                salvarTudo();
-                renderizarCultos();
-            }
-        }
-
-        function removerMomento(cultoId, momentoId) {
-            const culto = cultos.find(c => c.id === cultoId);
-            if (culto) {
-                culto.momentos = culto.momentos.filter(m => m.id !== momentoId);
-                salvarTudo();
-                renderizarCultos();
-                atualizarTabelasPessoas();
-            }
-        }
-
-        function adicionarMusicaMomento(cultoId, momentoId) {
-            const culto = cultos.find(c => c.id === cultoId);
-            if (culto) {
-                const momento = culto.momentos.find(m => m.id === momentoId);
-                if (momento) {
-                    if (!momento.musicas) momento.musicas = [];
-                    momento.musicas.push({ musica: '', tom: '', ritmo: '', bpm: '', cifra: '' });
-                    salvarTudo();
-                    renderizarCultos();
-                }
-            }
-        }
-
-        function removerMusicaMomento(cultoId, momentoId, indexMusica) {
-            const culto = cultos.find(c => c.id === cultoId);
-            if (culto) {
-                const momento = culto.momentos.find(m => m.id === momentoId);
-                if (momento && momento.musicas.length > 1) {
-                    momento.musicas.splice(indexMusica, 1);
-                    salvarTudo();
-                    renderizarCultos();
-                }
-            }
-        }
-
-        function atualizarMinistroMomento(cultoId, momentoId, valor) {
-            const culto = cultos.find(c => c.id === cultoId);
-            if (culto) {
-                const momento = culto.momentos.find(m => m.id === momentoId);
-                if (momento) { momento.ministro = valor; salvarTudo(); atualizarTabelasPessoas(); }
-            }
-        }
-
-        function atualizarMusicaDetalhe(cultoId, momentoId, indexMusica, campo, valor) {
-            const culto = cultos.find(c => c.id === cultoId);
-            if (culto) {
-                const momento = culto.momentos.find(m => m.id === momentoId);
-                if (momento && momento.musicas[indexMusica]) { momento.musicas[indexMusica][campo] = valor; salvarTudo(); }
-            }
-        }
-
-        function removerCulto(id) {
-            if (confirm("Deseja apagar este culto?")) {
-                cultos = cultos.filter(c => c.id !== id);
-                salvarTudo();
-                renderizarCultos();
-                atualizarTabelasPessoas();
-            }
-        }
-
-        function salvarEscalaNoHistorico() {
-            if (cultos.length === 0) return alert("Nao ha nenhuma escala no painel para salvar!");
-            const idHistorico = 'hist_' + Date.now();
-            const datasResumo = cultos.map(c => {
-                const [ano, mes, dia] = c.data.split('-');
-                return `${dia}/${mes}/${ano} (${c.tipo})`;
-            }).join(', ');
-
-            historicoEscalas.push({ id: idHistorico, tituloResumo: datasResumo, dataCriacao: new Date().toLocaleDateString('pt-BR'), cultos: [...cultos] });
-            escalaAtivaTitulo = datasResumo;
-            salvarTudo();
-            renderizarHistorico();
-            atualizarBalaoEscala();
-            alert("Escala guardada e arquivada com sucesso!");
-            mudarAba('historico');
-        }
-
-        function reiniciarEscalaAtiva() {
-            if (confirm("Tens a certeza que desejas limpar/reiniciar o painel da escala ativa?")) {
-                cultos = [];
-                escalaAtivaTitulo = null;
-                salvarTudo();
-                renderizarCultos();
-                atualizarBalaoEscala();
-                atualizarTabelasPessoas();
-                alert("Escala ativa limpa com sucesso!");
-            }
-        }
-
-        function carregarEscalaDoHistorico(id) {
-            const hist = historicoEscalas.find(h => h.id === id);
-            if (hist) {
-                cultos = [...hist.cultos];
-                escalaAtivaTitulo = hist.tituloResumo;
-                salvarTudo();
-                renderizarCultos();
-                atualizarTabelasPessoas();
-                atualizarBalaoEscala();
-                fecharModalEscala();
-                mudarAba('escala');
             }
         }
 
@@ -1440,7 +1255,6 @@
                 btnCarregar.classList.add('hidden');
             } else {
                 btnCarregar.classList.remove('hidden');
-                btnCarregar.setAttribute('onclick', `carregarEscalaDoHistorico('${hist.id}')`);
             }
             
             document.getElementById('modalVisualizarEscala').classList.remove('hidden');
@@ -1458,6 +1272,7 @@
 
         function renderizarHistorico() {
             const container = document.getElementById('listaHistoricoDatas');
+            if (!container) return;
             if (historicoEscalas.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center py-12 text-muted-custom text-sm italic">Nenhuma escala salva no momento.</div>`;
                 return;
@@ -1471,21 +1286,11 @@
                     <div class="flex justify-between items-center pt-3 border-t border-white/5">
                         <div class="flex items-center gap-2">
                             <button onclick="verEscalaModal('${hist.id}')" class="btn-glow text-xs px-4 py-2 rounded-xl font-bold flex items-center gap-1.5"><i class="fa-solid fa-eye"></i> Ver Escala</button>
-                            ${!modoPublicoAtivo ? `<button onclick="carregarEscalaDoHistorico('${hist.id}')" class="btn-secondary-custom text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Abrir</button>` : ''}
                         </div>
                         ${!modoPublicoAtivo ? `<button onclick="apagarHistorico('${hist.id}')" class="text-rose-400 hover:text-rose-300 text-sm px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>
             `).join('');
-        }
-
-        function renderizarCultos() {
-            const container = document.getElementById('listaCultos');
-            cultos.sort((a, b) => new Date(a.data) - new Date(b.data));
-            if (cultos.length === 0) {
-                container.innerHTML = `<div class="text-center py-14 text-muted-custom text-sm italic"><p>Nenhum culto ativo no painel no momento.</p></div>`;
-                return;
-            }
         }
 
         function exportarBackup() {
@@ -1514,7 +1319,6 @@
                     if (dados.historicoEscalas) historicoEscalas = dados.historicoEscalas;
                     if (dados.escalaAtivaTitulo !== undefined) escalaAtivaTitulo = dados.escalaAtivaTitulo;
                     salvarTudo();
-                    renderizarCultos();
                     renderizarHistorico();
                     renderizarListaCifras();
                     atualizarTabelasPessoas();
