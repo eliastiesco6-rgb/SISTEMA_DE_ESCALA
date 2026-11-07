@@ -738,7 +738,11 @@
         // =====================================================================
         // CONFIGURAÇÃO
         // =====================================================================
-        const DOC_NUVEM = ["sistema", "dados_igreja"];
+        // Dois documentos: o PÚBLICO (escalas salvas + repertório/cifras) qualquer visitante lê;
+        // o PRIVADO (rascunho, cantores, convidados, banda fixa) só o líder lê e grava.
+        // O nome do privado continua "dados_igreja" para aproveitar os dados que já existem.
+        const DOC_PUBLICO = ["sistema", "publico"];
+        const DOC_PRIVADO = ["sistema", "dados_igreja"];
         const LINK_PUBLICO_BASE = "https://eliastiesco6-rgb.github.io/SISTEMA_DE_ESCALA/";
 
         const params = new URLSearchParams(window.location.search);
@@ -778,9 +782,13 @@
         let escalaAtivaTitulo = cache.escalaAtivaTitulo || null;
 
         let usuario = null;             // usuário logado no Firebase
-        let nuvemCarregada = false;     // já recebemos o estado real da nuvem?
-        let cloudExiste = false;
-        let veioDoServidor = false;
+        let pubCarregado = false, pubExiste = false, pubDoServidor = false;      // documento público
+        let privCarregado = false, privExiste = false, privDoServidor = false;   // documento privado
+        let privRaw = null;             // último conteúdo lido do documento privado
+        let privTemLegado = false;      // o privado ainda guarda repertório/histórico (formato antigo)
+        let legadoAplicado = false;
+        let ultimoPub = null, ultimoPriv = null;  // o que já foi enviado (só grava o que mudou)
+        let unsubPriv = null;
         let saveTimer = null;
         let renderPendente = false;
         let abaAtual = null;
@@ -853,6 +861,8 @@
         function dadosAtuais() {
             return clone({ bandaFixa, cantores, convidados, repertorio, cultos, historicoEscalas, escalaAtivaTitulo });
         }
+        function dadosPublicos() { return clone({ repertorio, historicoEscalas }); }
+        function dadosPrivados() { return clone({ bandaFixa, cantores, convidados, cultos, escalaAtivaTitulo }); }
         function salvarCache() {
             try { localStorage.setItem('igreja_cache_v29', JSON.stringify(dadosAtuais())); } catch (e) { console.warn('Cache local cheio ou bloqueado', e); }
         }
@@ -864,6 +874,17 @@
             saveTimer = setTimeout(salvarTudo, 700);
         }
 
+        function podeLerPrivado() { return !modoLocal && !modoPublico && !!usuario; }
+        function nuvemPronta() { return pubCarregado && (!podeLerPrivado() || privCarregado); }
+
+        // Formato antigo: tudo estava no documento privado. Traz repertório/histórico de lá, uma vez.
+        function aplicarLegado() {
+            if (legadoAplicado || pubExiste || !privRaw) return;
+            legadoAplicado = true;
+            if (Array.isArray(privRaw.repertorio)) repertorio = clone(privRaw.repertorio);
+            if (Array.isArray(privRaw.historicoEscalas)) historicoEscalas = clone(privRaw.historicoEscalas);
+        }
+
         function salvarTudo() {
             clearTimeout(saveTimer);
             saveTimer = null;
@@ -872,11 +893,37 @@
 
             if (modoLocal) { setStatus('Salvo neste computador (sem nuvem)', 'amber'); return; }
             if (!window.fb) { setStatus('Sem conexão com a nuvem. Alterações só neste aparelho.', 'rose'); return; }
-            if (!nuvemCarregada) { setStatus('Aguardando carregar a nuvem...', 'amber'); return; }
+            if (!nuvemPronta()) { setStatus('Aguardando carregar a nuvem...', 'amber'); return; }
+            if (!pubExiste && privTemLegado && !legadoAplicado) aplicarLegado();
+
+            const pub = JSON.stringify(dadosPublicos());
+            const priv = JSON.stringify(dadosPrivados());
+            const precisaPub = pub !== ultimoPub;
+            const precisaPriv = priv !== ultimoPriv || privTemLegado;
+            if (!precisaPub && !precisaPriv) { setStatus('Salvo na nuvem', 'emerald'); return; }
 
             setStatus(navigator.onLine ? 'Salvando na nuvem...' : 'Offline: será enviado ao reconectar', 'amber');
-            const ref = window.fb.doc(window.fb.db, ...DOC_NUVEM);
-            window.fb.setDoc(ref, dadosAtuais())
+            const { db, doc, setDoc } = window.fb;
+
+            let wPub = Promise.resolve();
+            if (precisaPub) {
+                ultimoPub = pub;
+                wPub = setDoc(doc(db, ...DOC_PUBLICO), JSON.parse(pub))
+                    .then(() => { pubExiste = true; })
+                    .catch(err => { ultimoPub = null; throw err; });
+            }
+            let wPriv = Promise.resolve();
+            if (precisaPriv) {
+                ultimoPriv = priv;
+                // Só tira o repertório/histórico do documento privado DEPOIS de o público estar gravado.
+                const esperarPublico = privTemLegado && !pubExiste;
+                const tinhaLegado = privTemLegado;
+                privTemLegado = false;
+                const escrever = () => setDoc(doc(db, ...DOC_PRIVADO), JSON.parse(priv));
+                wPriv = (esperarPublico ? wPub.then(escrever) : escrever())
+                    .catch(err => { ultimoPriv = null; privTemLegado = tinhaLegado; throw err; });
+            }
+            Promise.all([wPub, wPriv])
                 .then(() => setStatus('Salvo na nuvem', 'emerald'))
                 .catch(err => {
                     console.error('Erro ao salvar no Firestore:', err);
@@ -884,14 +931,28 @@
                 });
         }
 
-        function aplicarDadosDaNuvem(d) {
+        function aplicarPublico(d) {
+            repertorio = d.repertorio || [];
+            historicoEscalas = d.historicoEscalas || [];
+            ultimoPub = JSON.stringify(dadosPublicos());
+            salvarCache();
+            renderTudoSeguro();
+        }
+        function aplicarPrivado(d) {
             bandaFixa = d.bandaFixa || [];
             cantores = d.cantores || [];
             convidados = d.convidados || [];
-            repertorio = d.repertorio || [];
             cultos = d.cultos || [];
-            historicoEscalas = d.historicoEscalas || [];
             escalaAtivaTitulo = d.escalaAtivaTitulo || null;
+            ultimoPriv = JSON.stringify(dadosPrivados());
+            salvarCache();
+            renderTudoSeguro();
+        }
+        // Visitante (ou líder que saiu): nada do que é privado fica na memória nem no cache do aparelho.
+        function limparPrivado() {
+            bandaFixa = []; cantores = []; convidados = []; cultos = []; escalaAtivaTitulo = null;
+            privCarregado = false; privExiste = false; privDoServidor = false;
+            privRaw = null; privTemLegado = false; legadoAplicado = false; ultimoPriv = null;
             salvarCache();
             renderTudoSeguro();
         }
@@ -900,13 +961,47 @@
             return bandaFixa.length || cantores.length || convidados.length || repertorio.length || cultos.length || historicoEscalas.length;
         }
 
-        // Se a nuvem estiver vazia (primeira vez), envia os dados deste aparelho.
+        // Migração: leva o repertório/histórico do documento antigo para o público (sem perder nada).
         function tentarMigracao() {
-            if (modoLocal || !nuvemCarregada || cloudExiste || !veioDoServidor || !isEditor()) return;
-            if (temDadosLocais()) {
-                cloudExiste = true;
+            if (modoLocal || !isEditor() || !nuvemPronta() || !pubDoServidor || !privDoServidor) return;
+            if (!pubExiste && privTemLegado) {
+                aplicarLegado();
+                salvarTudo();
+                aviso('Dados organizados: parte pública separada da privada.');
+            } else if (pubExiste && privTemLegado) {
+                salvarTudo(); // só limpa a cópia antiga que sobrou no documento privado
+            } else if (!pubExiste && !privExiste && temDadosLocais()) {
                 salvarTudo();
                 aviso('Dados locais enviados para a nuvem.');
+            }
+        }
+
+        function statusNuvem(snap) {
+            if (!isEditor()) return;
+            const pend = snap.metadata.hasPendingWrites;
+            setStatus(pend ? 'Enviando...' : (snap.metadata.fromCache && !navigator.onLine ? 'Offline (usando cópia local)' : 'Sincronizado com a nuvem'), pend ? 'amber' : 'emerald');
+        }
+
+        function gerenciarPrivado() {
+            if (podeLerPrivado()) {
+                if (unsubPriv) return;
+                const { db, doc, onSnapshot } = window.fb;
+                unsubPriv = onSnapshot(doc(db, ...DOC_PRIVADO), (snap) => {
+                    privExiste = snap.exists();
+                    privDoServidor = !snap.metadata.fromCache;
+                    if (snap.exists() || privDoServidor) privCarregado = true;
+                    privRaw = snap.exists() ? snap.data() : null;
+                    privTemLegado = !!(privRaw && ('repertorio' in privRaw || 'historicoEscalas' in privRaw));
+                    if (snap.exists() && !snap.metadata.hasPendingWrites && !saveTimer) aplicarPrivado(snap.data());
+                    statusNuvem(snap);
+                    tentarMigracao();
+                }, (err) => {
+                    console.error('Erro ao ler o documento privado:', err);
+                    setStatus(err && err.code === 'permission-denied' ? 'Sem permissão de leitura (ajuste as regras)' : 'Erro ao ler a nuvem', 'rose');
+                });
+            } else {
+                if (unsubPriv) { unsubPriv(); unsubPriv = null; }
+                limparPrivado();
             }
         }
 
@@ -915,22 +1010,18 @@
 
             onAuthStateChanged(auth, (user) => {
                 usuario = user;
+                gerenciarPrivado();
                 aplicarModoUI();
                 tentarMigracao();
             });
 
-            onSnapshot(doc(db, ...DOC_NUVEM), (snap) => {
-                cloudExiste = snap.exists();
-                veioDoServidor = !snap.metadata.fromCache;
-                if (snap.exists() || veioDoServidor) nuvemCarregada = true;
-
+            onSnapshot(doc(db, ...DOC_PUBLICO), (snap) => {
+                pubExiste = snap.exists();
+                pubDoServidor = !snap.metadata.fromCache;
+                if (snap.exists() || pubDoServidor) pubCarregado = true;
                 // Só aplica dados que vieram de outro lugar e se eu não estiver no meio de uma digitação.
-                if (snap.exists() && !snap.metadata.hasPendingWrites && !saveTimer) {
-                    aplicarDadosDaNuvem(snap.data());
-                }
-                if (isEditor()) {
-                    setStatus(snap.metadata.hasPendingWrites ? 'Enviando...' : (snap.metadata.fromCache && !navigator.onLine ? 'Offline (usando cópia local)' : 'Sincronizado com a nuvem'), snap.metadata.fromCache && !navigator.onLine ? 'amber' : 'emerald');
-                }
+                if (snap.exists() && !snap.metadata.hasPendingWrites && !saveTimer) aplicarPublico(snap.data());
+                statusNuvem(snap);
                 tentarMigracao();
             }, (err) => {
                 console.error('Erro ao ler a nuvem:', err);
@@ -1101,6 +1192,7 @@
             reader.onload = function (e) {
                 try {
                     const d = JSON.parse(e.target.result);
+                    if (!modoLocal && !nuvemPronta()) { aviso('Aguarde a nuvem carregar antes de importar.'); return; }
                     if (!confirm('Importar este backup vai SUBSTITUIR os dados atuais' + (modoLocal ? '.' : ' (inclusive os da nuvem).') + ' Continuar?')) return;
                     const arr = v => Array.isArray(v) ? v : [];
                     bandaFixa = arr(d.bandaFixa);
@@ -1110,7 +1202,6 @@
                     cultos = arr(d.cultos);
                     historicoEscalas = arr(d.historicoEscalas);
                     escalaAtivaTitulo = d.escalaAtivaTitulo || null;
-                    if (!modoLocal && !nuvemCarregada) { aviso('Aguarde a nuvem carregar antes de importar.'); return; }
                     salvarTudo();
                     renderTudo();
                     aviso('Dados importados com sucesso!');
