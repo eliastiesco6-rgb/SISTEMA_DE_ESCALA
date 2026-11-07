@@ -137,6 +137,7 @@
         #drawerMenu.fechado { transform: translateX(-105%); visibility: hidden; transition: transform .22s ease, visibility 0s .22s; }
         [id^="conteudo-"] { scroll-margin-top: 5.5rem; }
         @media (min-width: 768px) { #barraMenuMobile, #drawerMenu, #drawerFundo { display: none !important; } }
+        @media (max-width: 767px) { #acoesBarraAdmin, #barraVisitante { display: none !important; } }
 
         /* ---------- MODO PALCO (cifra em tela cheia, letra grande) ---------- */
         #modalTextoCifra { font-size: var(--cifra-fs, 14px) !important; }
@@ -225,7 +226,7 @@
                 <span id="statusBackup" class="text-xs"></span>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
+            <div id="acoesBarraAdmin" class="flex flex-wrap items-center gap-3">
                 <button type="button" onclick="instalarApp()" class="btn-instalar hidden btn-secondary-custom px-4 py-2.5 rounded-xl flex items-center gap-2">
                     <i class="fa-solid fa-mobile-screen-button dynamic-accent"></i> Instalar App
                 </button>
@@ -567,7 +568,42 @@
             </div>
             <button type="button" onclick="fecharMenu()" aria-label="Fechar menu" class="btn-secondary-custom w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <nav id="navMenuLateral" class="flex-1 overflow-y-auto p-3 space-y-2"></nav>
+        <div class="flex-1 overflow-y-auto">
+            <nav id="navMenuLateral" class="p-3 space-y-2"></nav>
+
+            <div id="acoesMenuLateral" class="p-3 space-y-2 border-t border-white/10">
+                <div class="text-[11px] font-black uppercase tracking-widest text-muted-custom px-1 pb-1">Ações</div>
+
+                <div id="acoesLiderMenu" class="space-y-2 hidden">
+                    <button type="button" onclick="fecharMenu(); copiarLinkPublico()" class="btn-glow w-full px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-3">
+                        <i class="fa-solid fa-share-nodes w-5 text-center"></i> Copiar Link para a Igreja
+                    </button>
+                    <button type="button" onclick="fecharMenu(); exportarBackup()" class="btn-secondary-custom w-full px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-3">
+                        <i class="fa-solid fa-cloud-arrow-down dynamic-accent w-5 text-center"></i> Exportar Dados
+                    </button>
+                    <label class="btn-secondary-custom w-full px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-3 cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-up dynamic-accent w-5 text-center"></i> Importar Dados
+                        <input type="file" id="inputImportarMenu" accept=".json" onchange="fecharMenu(); importarBackup(event)" class="hidden">
+                    </label>
+                </div>
+
+                <button type="button" onclick="fecharMenu(); instalarApp()" class="btn-instalar hidden btn-secondary-custom w-full px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-3">
+                    <i class="fa-solid fa-mobile-screen-button dynamic-accent w-5 text-center"></i> Instalar App
+                </button>
+
+                <div class="flex items-center gap-3 px-1 py-1">
+                    <label for="selectBgMenu" class="text-muted-custom font-bold text-sm flex-shrink-0"><i class="fa-solid fa-palette dynamic-accent mr-1"></i> Tema</label>
+                    <select id="selectBgMenu" onchange="mudarFundo(this.value)" class="input-custom rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none cursor-pointer flex-1 min-w-0"></select>
+                </div>
+
+                <button id="btnAreaLiderMenu" type="button" onclick="fecharMenu(); abrirLogin()" class="btn-secondary-custom w-full px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-3 hidden">
+                    <i class="fa-solid fa-lock w-5 text-center"></i> Área do líder
+                </button>
+                <button id="btnSairMenu" type="button" onclick="fecharMenu(); sair()" class="btn-secondary-custom w-full px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-3 hidden">
+                    <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Sair
+                </button>
+            </div>
+        </div>
     </aside>
 
     <div id="toast" class="hidden no-print fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] px-5 py-3 rounded-2xl text-sm font-bold card-custom"></div>
@@ -1180,6 +1216,9 @@
             setHidden('barraVisitante', editor);
             setHidden('btnAreaLider', modoPublico || modoLocal);
             setHidden('btnSair', !usuario || modoPublico);
+            setHidden('acoesLiderMenu', !editor);
+            setHidden('btnAreaLiderMenu', editor || modoPublico || modoLocal);
+            setHidden('btnSairMenu', !usuario || modoPublico);
 
             if (editor) {
                 document.getElementById('tituloPrincipalApp').innerText = 'Escalas & Repertório';
@@ -1268,7 +1307,7 @@
             document.body.className = document.body.className.replace(/theme-bg-\w+/g, '').trim();
             document.body.classList.add('theme-bg-' + cor);
             localStorage.setItem('igreja_theme_bg_v28', cor);
-            ['selectBg', 'selectBg2'].forEach(id => { const s = document.getElementById(id); if (s) s.value = cor; });
+            ['selectBg', 'selectBg2', 'selectBgMenu'].forEach(id => { const s = document.getElementById(id); if (s) s.value = cor; });
         }
 
         function copiarLinkPublico() {
@@ -1308,7 +1347,8 @@
         }
 
         function importarBackup(event) {
-            const file = event.target.files[0];
+            const input = event.target;
+            const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -1328,9 +1368,9 @@
                     renderTudo();
                     aviso('Dados importados com sucesso!');
                 } catch (err) { aviso('Erro ao ler o arquivo de backup.'); }
-                event.target.value = '';
             };
             reader.readAsText(file);
+            input.value = '';
         }
 
         // =====================================================================
@@ -2413,6 +2453,7 @@
             const opcoesTema = TEMAS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
             document.getElementById('selectBg').innerHTML = opcoesTema;
             document.getElementById('selectBg2').innerHTML = opcoesTema;
+            document.getElementById('selectBgMenu').innerHTML = opcoesTema;
             popularCapotraste('repCapotraste', 'Sem capotraste');
             popularCapotraste('editCapotraste', 'Sem capotraste');
             popularCapotraste('selectModalCapo', 'Sem capo');
