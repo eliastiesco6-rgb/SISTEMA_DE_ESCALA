@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escalas e Repertório de Louvor - Igreja</title>
+    <!-- PWA: instalar no celular e abrir offline -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#06080f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Louvor">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -113,6 +122,22 @@
         .diagrama-acorde svg { color: #cbd5e1; }
         body.theme-bg-branco .diagrama-acorde svg { color: #334155; }
 
+        /* ---------- MODO PALCO (cifra em tela cheia, letra grande) ---------- */
+        #modalTextoCifra { font-size: var(--cifra-fs, 14px) !important; }
+        #modalVisualizarCifra.palco { padding: 0 !important; background: #000; }
+        #modalVisualizarCifra.palco #caixaModalCifra {
+            max-width: 100%; width: 100%; height: 100%; max-height: 100%;
+            border-radius: 0; border: 0; padding: 10px 12px;
+        }
+        #modalVisualizarCifra.palco #secaoDiagramas,
+        #modalVisualizarCifra.palco #secaoBatidas,
+        #modalVisualizarCifra.palco #rodapeModalCifra,
+        #modalVisualizarCifra.palco #modalArtistaMusica,
+        #modalVisualizarCifra.palco #modalYoutubeContainer { display: none !important; }
+        #modalVisualizarCifra.palco #modalNomeMusica { font-size: 1.15rem; }
+        #modalVisualizarCifra.palco #modalTextoCifra {
+            white-space: pre; overflow-x: auto; padding: 12px; line-height: 1.55;
+        }
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; }
@@ -173,6 +198,9 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
+                <button type="button" onclick="instalarApp()" class="btn-instalar hidden btn-secondary-custom px-4 py-2.5 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen-button dynamic-accent"></i> Instalar App
+                </button>
                 <button onclick="copiarLinkPublico()" class="btn-glow px-4 py-2.5 rounded-xl flex items-center gap-2">
                     <i class="fa-solid fa-share-nodes"></i> Copiar Link para a Igreja
                 </button>
@@ -203,6 +231,9 @@
             <div class="flex items-center gap-2">
                 <label class="text-muted-custom">Tema:</label>
                 <select id="selectBg2" onchange="mudarFundo(this.value)" class="input-custom rounded-xl px-3 py-1.5 text-sm font-bold focus:outline-none cursor-pointer"></select>
+                <button type="button" onclick="instalarApp()" class="btn-instalar hidden btn-secondary-custom px-4 py-2 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen-button dynamic-accent"></i> Instalar App
+                </button>
                 <button id="btnAreaLider" onclick="abrirLogin()" class="btn-secondary-custom px-4 py-2 rounded-xl flex items-center gap-2">
                     <i class="fa-solid fa-lock"></i> Área do líder
                 </button>
@@ -592,7 +623,7 @@
 
     <!-- MODAL VISUALIZADOR DE CIFRA -->
     <div id="modalVisualizarCifra" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[60] flex items-center justify-center p-2 sm:p-4 hidden">
-        <div class="card-custom p-5 sm:p-8 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col border border-white/10 relative overflow-hidden">
+        <div id="caixaModalCifra" class="card-custom p-5 sm:p-8 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col border border-white/10 relative overflow-hidden">
 
             <div class="flex justify-between items-start border-b border-white/10 pb-4 flex-shrink-0 gap-4">
                 <div>
@@ -631,6 +662,16 @@
                     <button onclick="ajustarVelocidadeRolagem(0.1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 font-bold flex items-center justify-center" title="+0.1x">+</button>
                 </div>
 
+                <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-xl border border-white/10 text-slate-200">
+                    <span class="font-bold text-muted-custom"><i class="fa-solid fa-text-height mr-1"></i> Letra:</span>
+                    <button onclick="mudarFonteCifra(-2)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 font-bold flex items-center justify-center" title="Diminuir letra">A-</button>
+                    <span id="displayFonteCifra" class="font-mono font-bold text-xs">14</span>
+                    <button onclick="mudarFonteCifra(2)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 font-bold flex items-center justify-center" title="Aumentar letra">A+</button>
+                    <button id="btnPalco" onclick="alternarPalco()" class="btn-glow px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-expand text-xs" id="iconePalco"></i> <span id="textoBtnPalco">Palco</span>
+                    </button>
+                </div>
+
                 <div id="modalYoutubeContainer" class="hidden">
                     <a id="modalLinkYoutube" href="#" target="_blank" rel="noopener" class="btn-secondary-custom px-4 py-2 rounded-xl font-bold inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300">
                         <i class="fa-brands fa-youtube text-sm"></i> YouTube
@@ -659,7 +700,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-end pt-3 border-t border-white/10 flex-shrink-0">
+            <div id="rodapeModalCifra" class="flex justify-end pt-3 border-t border-white/10 flex-shrink-0">
                 <button onclick="fecharModalCifra()" class="btn-secondary-custom text-xs font-bold px-6 py-2.5 rounded-xl">Fechar</button>
             </div>
         </div>
@@ -1790,9 +1831,12 @@
             atualizarExibicaoModalCifra();
             document.getElementById('modalVisualizarCifra').classList.remove('hidden');
             document.getElementById('corpoModalCifra').scrollTop = 0;
+            aplicarPalco(lerLS('igreja_palco_v1', false));
+            solicitarWakeLock();
         }
         function fecharModalCifra() {
             pararRolagem();
+            liberarWakeLock();
             document.getElementById('modalVisualizarCifra').classList.add('hidden');
         }
         function mudarCapotrasteModal(v) { capoAtualModal = parseInt(v); atualizarExibicaoModalCifra(); }
@@ -1949,6 +1993,85 @@
             }).join('');
         }
 
+
+        // =====================================================================
+        // MODO PALCO, TAMANHO DA LETRA E TELA SEMPRE LIGADA
+        // =====================================================================
+        let fonteCifra = parseInt(localStorage.getItem('igreja_cifra_fs_v1'), 10) || 14;
+        let wakeLock = null;
+
+        function aplicarFonteCifra() {
+            fonteCifra = Math.max(10, Math.min(44, fonteCifra));
+            document.documentElement.style.setProperty('--cifra-fs', fonteCifra + 'px');
+            const d = document.getElementById('displayFonteCifra');
+            if (d) d.innerText = fonteCifra;
+            try { localStorage.setItem('igreja_cifra_fs_v1', String(fonteCifra)); } catch (e) {}
+        }
+        function mudarFonteCifra(delta) { fonteCifra += delta; aplicarFonteCifra(); }
+
+        function aplicarPalco(ligado) {
+            const modal = document.getElementById('modalVisualizarCifra');
+            if (!modal) return;
+            modal.classList.toggle('palco', !!ligado);
+            const t = document.getElementById('textoBtnPalco'), i = document.getElementById('iconePalco');
+            if (t) t.innerText = ligado ? 'Sair do Palco' : 'Palco';
+            if (i) i.className = 'fa-solid ' + (ligado ? 'fa-compress' : 'fa-expand') + ' text-xs';
+            try { localStorage.setItem('igreja_palco_v1', JSON.stringify(!!ligado)); } catch (e) {}
+        }
+        function alternarPalco() {
+            aplicarPalco(!document.getElementById('modalVisualizarCifra').classList.contains('palco'));
+        }
+
+        function cifraAberta() {
+            const m = document.getElementById('modalVisualizarCifra');
+            return !!m && !m.classList.contains('hidden');
+        }
+        async function solicitarWakeLock() {
+            try {
+                if (!('wakeLock' in navigator) || wakeLock) return;
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => { wakeLock = null; });
+            } catch (e) { /* navegador sem suporte ou economia de bateria: segue sem */ }
+        }
+        function liberarWakeLock() {
+            if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+        }
+        // O navegador solta a tela ligada quando você troca de app; pede de novo ao voltar.
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && cifraAberta()) solicitarWakeLock();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && cifraAberta()) fecharModalCifra();
+        });
+
+        // =====================================================================
+        // PWA: instalar no celular e abrir offline
+        // =====================================================================
+        let promptInstalacao = null;
+        const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const jaInstalado = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        function mostrarBotaoInstalar(mostrar) {
+            document.querySelectorAll('.btn-instalar').forEach(b => b.classList.toggle('hidden', !mostrar));
+        }
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalacao = e; mostrarBotaoInstalar(true); });
+        window.addEventListener('appinstalled', () => { promptInstalacao = null; mostrarBotaoInstalar(false); aviso('App instalado!'); });
+        async function instalarApp() {
+            if (promptInstalacao) {
+                promptInstalacao.prompt();
+                try { await promptInstalacao.userChoice; } catch (e) {}
+                promptInstalacao = null;
+                mostrarBotaoInstalar(false);
+            } else {
+                aviso('No iPhone: toque em Compartilhar e depois em "Adicionar à Tela de Início".');
+            }
+        }
+        if (ehIOS && !jaInstalado) mostrarBotaoInstalar(true);
+        if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker não registrado:', err));
+            });
+        }
+
         // =====================================================================
         // INICIALIZAÇÃO
         // =====================================================================
@@ -1964,6 +2087,7 @@
             document.getElementById('dataCultoInput').value = hojeISO();
             document.getElementById('tipoCultoInput').value = 'Culto de Domingo';
 
+            aplicarFonteCifra();
             aplicarModoUI();
             renderTudo();
             iniciarNuvem();
