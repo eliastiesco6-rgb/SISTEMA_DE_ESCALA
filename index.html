@@ -122,6 +122,22 @@
         .diagrama-acorde svg { color: #cbd5e1; }
         body.theme-bg-branco .diagrama-acorde svg { color: #334155; }
 
+        /* ---------- MENU LATERAL (celular) ---------- */
+        #barraMenuMobile { position: sticky; top: 0; z-index: 50; }
+        #drawerFundo { position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); transition: opacity .22s ease; }
+        #drawerFundo.fechado { opacity: 0; pointer-events: none; }
+        #drawerMenu {
+            position: fixed; top: 0; bottom: 0; left: 0; z-index: 75; width: 18rem; max-width: 85vw;
+            background: #0d111c; color: #f3f4f6; border-right: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 20px 0 50px -15px rgba(0,0,0,0.8);
+            padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+            transition: transform .22s ease, visibility 0s;
+        }
+        body.theme-bg-branco #drawerMenu { background: #ffffff; color: #0f172a; border-color: #e2e8f0; box-shadow: 20px 0 50px -15px rgba(0,0,0,0.25); }
+        #drawerMenu.fechado { transform: translateX(-105%); visibility: hidden; transition: transform .22s ease, visibility 0s .22s; }
+        [id^="conteudo-"] { scroll-margin-top: 5.5rem; }
+        @media (min-width: 768px) { #barraMenuMobile, #drawerMenu, #drawerFundo { display: none !important; } }
+
         /* ---------- MODO PALCO (cifra em tela cheia, letra grande) ---------- */
         #modalTextoCifra { font-size: var(--cifra-fs, 14px) !important; }
         #modalVisualizarCifra.palco { padding: 0 !important; background: #000; }
@@ -189,6 +205,17 @@
 <body class="theme-bg-preto min-h-screen font-sans p-4 sm:p-8 transition-colors duration-300 text-sm">
 
     <div class="max-w-6xl mx-auto space-y-6">
+
+        <!-- BARRA DO MENU (só no celular): botão ☰ + nome da seção atual -->
+        <div id="barraMenuMobile" class="no-print card-custom rounded-2xl px-3 py-2.5 flex items-center gap-3">
+            <button id="btnMenuLateral" type="button" onclick="abrirMenu()" aria-label="Abrir menu" aria-expanded="false" class="btn-secondary-custom w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <div class="min-w-0 flex-1">
+                <div class="text-[10px] font-black uppercase tracking-widest text-muted-custom">Ministério de Louvor</div>
+                <div id="tituloAbaMobile" class="font-black text-base truncate">Menu</div>
+            </div>
+        </div>
 
         <!-- BARRA DO LIDER (somente quando logado) -->
         <div id="barraSuperiorAdmin" class="no-print card-custom p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-sm font-bold hidden">
@@ -262,7 +289,7 @@
         </header>
 
         <!-- MENU DE ABAS -->
-        <div id="menuAbas" class="flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
+        <div id="menuAbas" class="hidden md:flex flex-wrap gap-3 no-print border-b border-white/10 pb-4">
             <button onclick="mudarAba('escala')" id="tab-escala"><i class="fa-solid fa-calendar-days"></i> Escala Ativa</button>
             <button onclick="mudarAba('historico')" id="tab-historico"><i class="fa-solid fa-folder-open"></i> Escalas Salvas</button>
             <button onclick="mudarAba('repertorio')" id="tab-repertorio"><i class="fa-solid fa-music"></i> Novo Repertório</button>
@@ -527,6 +554,22 @@
     <datalist id="listaMusicasRep"></datalist>
 
     <!-- AVISO RAPIDO -->
+    <!-- MENU LATERAL (celular) -->
+    <div id="drawerFundo" class="no-print fechado" onclick="fecharMenu()"></div>
+    <aside id="drawerMenu" class="no-print fechado flex flex-col" role="dialog" aria-modal="true" aria-label="Menu de navegação" aria-hidden="true">
+        <div class="flex items-center justify-between gap-3 p-4 border-b border-white/10">
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: var(--accent-glow); color: var(--accent-color);"><i class="fa-solid fa-church"></i></span>
+                <div class="min-w-0">
+                    <div class="font-black text-sm truncate">Ministério de Louvor</div>
+                    <div id="modoMenuLateral" class="text-xs text-muted-custom font-bold"></div>
+                </div>
+            </div>
+            <button type="button" onclick="fecharMenu()" aria-label="Fechar menu" class="btn-secondary-custom w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <nav id="navMenuLateral" class="flex-1 overflow-y-auto p-3 space-y-2"></nav>
+    </aside>
+
     <div id="toast" class="hidden no-print fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] px-5 py-3 rounded-2xl text-sm font-bold card-custom"></div>
 
     <!-- MODAL LOGIN -->
@@ -1164,7 +1207,62 @@
                 document.getElementById('conteudo-' + a).classList.toggle('hidden', a !== aba);
                 document.getElementById('tab-' + a).className = CLASSE_ABA + (a === aba ? ' btn-glow' : ' btn-secondary-custom') + (oculta ? ' hidden' : '');
             });
+            montarMenuLateral();
         }
+
+        // ---------- Menu lateral (celular) ----------
+        const ROTULOS_ABA = {
+            escala: ['fa-calendar-days', 'Escala Ativa'], historico: ['fa-folder-open', 'Escalas Salvas'],
+            repertorio: ['fa-music', 'Novo Repertório'], listacifras: ['fa-book-open', 'Lista de Cifras'],
+            pessoas: ['fa-users-gear', 'Banda e Cantores'], convidados: ['fa-star', 'Convidados']
+        };
+        function montarMenuLateral() {
+            const nav = document.getElementById('navMenuLateral');
+            if (!nav) return;
+            nav.innerHTML = ABAS.filter(a => !(ABAS_LIDER.includes(a) && !isEditor())).map(a => {
+                const [icone, rotulo] = ROTULOS_ABA[a];
+                const ativa = a === abaAtual;
+                return `<button type="button" onclick="irParaAba('${a}')" ${ativa ? 'aria-current="page"' : ''} class="w-full text-left px-4 py-3.5 rounded-2xl text-sm font-extrabold flex items-center gap-3 ${ativa ? 'btn-glow' : 'btn-secondary-custom'}"><i class="fa-solid ${icone} w-5 text-center"></i> ${rotulo}</button>`;
+            }).join('');
+            const t = document.getElementById('tituloAbaMobile');
+            if (t && ROTULOS_ABA[abaAtual]) t.innerText = ROTULOS_ABA[abaAtual][1];
+            const modo = document.getElementById('modoMenuLateral');
+            if (modo) modo.innerText = isEditor() ? 'Modo líder' : 'Somente leitura';
+        }
+        function menuAberto() {
+            const d = document.getElementById('drawerMenu');
+            return !!d && !d.classList.contains('fechado');
+        }
+        function abrirMenu() {
+            montarMenuLateral();
+            document.getElementById('drawerMenu').classList.remove('fechado');
+            document.getElementById('drawerFundo').classList.remove('fechado');
+            document.getElementById('drawerMenu').setAttribute('aria-hidden', 'false');
+            document.getElementById('btnMenuLateral').setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+        function fecharMenu() {
+            const d = document.getElementById('drawerMenu'), f = document.getElementById('drawerFundo'), b = document.getElementById('btnMenuLateral');
+            if (d) { d.classList.add('fechado'); d.setAttribute('aria-hidden', 'true'); }
+            if (f) f.classList.add('fechado');
+            if (b) b.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+        function irParaAba(a) {
+            mudarAba(a);
+            fecharMenu();
+            const alvo = document.getElementById('conteudo-' + a);
+            if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        (function () {
+            const d = document.getElementById('drawerMenu');
+            let x0 = null;
+            if (d) {
+                d.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+                d.addEventListener('touchend', (e) => { if (x0 !== null && x0 - e.changedTouches[0].clientX > 60) fecharMenu(); x0 = null; }, { passive: true });
+            }
+            window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => { if (e.matches) fecharMenu(); });
+        })();
 
         function mudarFundo(cor) {
             document.body.className = document.body.className.replace(/theme-bg-\w+/g, '').trim();
@@ -2168,6 +2266,7 @@
             if (document.visibilityState === 'visible' && cifraAberta()) solicitarWakeLock();
         });
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menuAberto()) { fecharMenu(); return; }
             if (!cifraAberta()) return;
             if (e.key === 'Escape') { fecharModalCifra(); return; }
             // Setas ← → (teclado ou pedal Bluetooth de virar página) trocam de música no culto.
