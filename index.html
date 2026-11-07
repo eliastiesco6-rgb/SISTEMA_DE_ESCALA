@@ -135,6 +135,7 @@
         #modalVisualizarCifra.palco #modalArtistaMusica,
         #modalVisualizarCifra.palco #modalYoutubeContainer { display: none !important; }
         #modalVisualizarCifra.palco #modalNomeMusica { font-size: 1.15rem; }
+        #modalVisualizarCifra.palco #barraSetlist button { padding-top: 1rem; padding-bottom: 1rem; font-size: 1rem; }
         #modalVisualizarCifra.palco #modalTextoCifra {
             white-space: pre; overflow-x: auto; padding: 12px; line-height: 1.55;
         }
@@ -697,6 +698,15 @@
                 <div class="space-y-2">
                     <span class="text-xs font-bold text-muted-custom uppercase tracking-wider block">Cifra / Partitura:</span>
                     <pre id="modalTextoCifra" class="cifra-texto bg-black/60 p-5 rounded-2xl text-xs sm:text-sm overflow-x-auto text-slate-200 border border-white/5 whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+
+            <div id="barraSetlist" class="hidden flex-shrink-0 pt-3 mt-1 border-t border-white/10">
+                <div id="listaSetlist" class="hidden mb-2 max-h-48 overflow-y-auto sub-card rounded-2xl border border-white/10 p-2 space-y-1"></div>
+                <div class="flex items-stretch gap-2">
+                    <button id="btnSetlistAnterior" type="button" onclick="irSetlist(-1)" class="btn-secondary-custom flex-1 sm:flex-none sm:w-40 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+                    <button type="button" onclick="alternarListaSetlist()" class="btn-secondary-custom flex-[2] min-w-0 py-3 px-3 rounded-xl text-xs font-bold" title="Ver a lista do culto"><span id="rotuloSetlist" class="block truncate"></span></button>
+                    <button id="btnSetlistProxima" type="button" onclick="irSetlist(1)" class="btn-glow flex-1 sm:flex-none sm:w-40 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2">Próxima <i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
 
@@ -1468,7 +1478,7 @@
                                 <input type="text" value="${esc(mus.cifra)}" oninput="atualizarCampoMusica('${cid}','${mid}',${idx},'cifra',this.value)" placeholder="Link da cifra (opcional)" class="w-full input-custom rounded-xl px-4 py-3 text-sm">
                             </div>
                             <div class="sm:col-span-1 flex items-center justify-center gap-1">
-                                ${mus.repId && repertorio.some(r => r.id === mus.repId) ? `<button onclick="verCifraModal('${idSeguro(mus.repId)}')" class="dynamic-accent p-2" title="Ver cifra do repertório"><i class="fa-solid fa-book-open-reader"></i></button>` : ''}
+                                ${mus.repId && repertorio.some(r => r.id === mus.repId) ? `<button onclick="abrirCifraEscala('ativa','${cid}','${mid}',${idx})" class="dynamic-accent p-2" title="Ver cifra do repertório"><i class="fa-solid fa-book-open-reader"></i></button>` : ''}
                                 <button onclick="removerMusicaMomento('${cid}','${mid}',${idx})" class="text-rose-400 hover:text-rose-300 p-2" title="Remover música"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </div>`).join('');
@@ -1514,6 +1524,7 @@
                                 </select>
                                 <button onclick="adicionarMomento('${cid}')" class="btn-secondary-custom text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Momento</button>
                             </div>
+                            <button onclick="abrirCultoNoPalco('ativa','${cid}')" class="btn-glow text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5" title="Abrir as cifras deste culto em tela cheia"><i class="fa-solid fa-expand"></i> Abrir no palco</button>
                             <button onclick="removerCulto('${cid}')" class="text-rose-400 hover:text-rose-300 px-3 py-2.5 text-xs font-bold" title="Remover culto"><i class="fa-solid fa-trash-can mr-1"></i> Remover culto</button>
                         </div>
                         <div class="space-y-4">${momentosHtml}</div>
@@ -1608,11 +1619,11 @@
             }).join('');
         }
 
-        function linhaMusicaView(mus) {
+        function linhaMusicaView(mus, hist, culto, m) {
             const rep = mus.repId ? repertorio.find(r => r.id === mus.repId) : null;
             const link = urlSegura(mus.cifra);
             let acoes = '';
-            if (rep) acoes += `<button onclick="verCifraModal('${idSeguro(rep.id)}')" class="btn-glow text-xs px-3 py-1 rounded-lg font-bold inline-flex items-center gap-1"><i class="fa-solid fa-book-open-reader"></i> Cifra</button>`;
+            if (rep) acoes += `<button onclick="abrirCifraEscala('${idSeguro(hist.id)}','${idSeguro(culto.id)}','${idSeguro(m.id)}',${(m.musicas || []).indexOf(mus)})" class="btn-glow text-xs px-3 py-1 rounded-lg font-bold inline-flex items-center gap-1"><i class="fa-solid fa-book-open-reader"></i> Cifra</button>`;
             else if (link) acoes += `<a href="${esc(link)}" target="_blank" rel="noopener" class="btn-glow text-xs px-3 py-1 rounded-lg font-bold inline-flex items-center gap-1"><i class="fa-solid fa-link"></i> Cifra</a>`;
             if (rep && urlSegura(rep.youtube)) acoes += ` <a href="${esc(urlSegura(rep.youtube))}" target="_blank" rel="noopener" class="text-rose-400 text-sm px-1"><i class="fa-brands fa-youtube"></i></a>`;
             return `<div class="grid grid-cols-1 sm:grid-cols-6 gap-2 pt-1 text-xs items-center border-b border-white/5 pb-2">
@@ -1641,13 +1652,16 @@
                             <span class="text-xs font-black uppercase dynamic-accent tracking-wider">${esc(m.titulo)}</span>
                             <span class="text-xs font-bold">Ministro: ${esc(m.ministro || 'Não definido')}</span>
                         </div>
-                        <div class="space-y-1 pt-1">${musicas.length ? musicas.map(linhaMusicaView).join('') : '<span class="text-xs text-muted-custom italic">Músicas ainda não definidas.</span>'}</div>
+                        <div class="space-y-1 pt-1">${musicas.length ? musicas.map(x => linhaMusicaView(x, hist, culto, m)).join('') : '<span class="text-xs text-muted-custom italic">Músicas ainda não definidas.</span>'}</div>
                     </div>`;
                 }).join('');
                 return `<div class="sub-card p-5 rounded-2xl space-y-4 border border-white/10">
                     <div class="flex justify-between items-center border-b border-white/10 pb-3 gap-2 flex-wrap">
                         <span class="text-xs font-black uppercase px-3 py-1 rounded-xl border" style="background-color: var(--accent-glow); color: var(--accent-color); border-color: var(--accent-color);">${esc(culto.tipo)}</span>
-                        <span class="text-xs font-mono text-muted-custom">${esc(diaSemana(culto.data))} • ${esc(fmtData(culto.data))}</span>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="text-xs font-mono text-muted-custom">${esc(diaSemana(culto.data))} • ${esc(fmtData(culto.data))}</span>
+                            <button onclick="abrirCultoNoPalco('${idSeguro(hist.id)}','${idSeguro(culto.id)}')" class="btn-glow text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5" title="Abrir as cifras deste culto em tela cheia"><i class="fa-solid fa-expand"></i> Abrir no palco</button>
+                        </div>
                     </div>
                     <div><span class="text-xs font-bold text-muted-custom uppercase tracking-wider block mb-2">Banda:</span><div class="flex flex-wrap gap-2">${bandaHtml}</div></div>
                     <div class="space-y-2.5"><span class="text-xs font-bold text-muted-custom uppercase tracking-wider block">Momentos:</span>${momentosHtml}</div>
@@ -1926,22 +1940,30 @@
             }).join('');
         }
 
-        function verCifraModal(id) {
+        function verCifraModal(id, opcoes) {
             const m = repertorio.find(r => r.id === id);
             if (!m) return;
+            const modalCifra = document.getElementById('modalVisualizarCifra');
+            const jaAberto = !modalCifra.classList.contains('hidden');
             musicaAtualEmExibicao = m;
-            tomAtualTransposicao = 0;
+            // Aberta pela escala: já abre no tom que você definiu para aquele culto.
+            tomAtualTransposicao = (opcoes && opcoes.tom) ? semitonsEntre(m.tom || 'C', opcoes.tom) : 0;
             capoAtualModal = m.capotraste || 0;
             document.getElementById('selectModalCapo').value = capoAtualModal;
             atualizarExibicaoModalCifra();
             document.getElementById('modalVisualizarCifra').classList.remove('hidden');
             document.getElementById('corpoModalCifra').scrollTop = 0;
-            aplicarPalco(lerLS('igreja_palco_v1', false));
+            if (!jaAberto) aplicarPalco(lerLS('igreja_palco_v1', false));
             solicitarWakeLock();
+            if (!(opcoes && opcoes.setlist)) setlistAtual = null;
+            atualizarBarraSetlist();
         }
         function fecharModalCifra() {
             pararRolagem();
             liberarWakeLock();
+            setlistAtual = null;
+            fecharListaSetlist();
+            atualizarBarraSetlist();
             document.getElementById('modalVisualizarCifra').classList.add('hidden');
         }
         function mudarCapotrasteModal(v) { capoAtualModal = parseInt(v); atualizarExibicaoModalCifra(); }
@@ -2114,14 +2136,14 @@
         }
         function mudarFonteCifra(delta) { fonteCifra += delta; aplicarFonteCifra(); }
 
-        function aplicarPalco(ligado) {
+        function aplicarPalco(ligado, persistir = true) {
             const modal = document.getElementById('modalVisualizarCifra');
             if (!modal) return;
             modal.classList.toggle('palco', !!ligado);
             const t = document.getElementById('textoBtnPalco'), i = document.getElementById('iconePalco');
             if (t) t.innerText = ligado ? 'Sair do Palco' : 'Palco';
             if (i) i.className = 'fa-solid ' + (ligado ? 'fa-compress' : 'fa-expand') + ' text-xs';
-            try { localStorage.setItem('igreja_palco_v1', JSON.stringify(!!ligado)); } catch (e) {}
+            if (persistir) { try { localStorage.setItem('igreja_palco_v1', JSON.stringify(!!ligado)); } catch (e) {} }
         }
         function alternarPalco() {
             aplicarPalco(!document.getElementById('modalVisualizarCifra').classList.contains('palco'));
@@ -2146,8 +2168,116 @@
             if (document.visibilityState === 'visible' && cifraAberta()) solicitarWakeLock();
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && cifraAberta()) fecharModalCifra();
+            if (!cifraAberta()) return;
+            if (e.key === 'Escape') { fecharModalCifra(); return; }
+            // Setas ← → (teclado ou pedal Bluetooth de virar página) trocam de música no culto.
+            if (setlistAtual && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+                const tag = ((document.activeElement || {}).tagName || '').toUpperCase();
+                if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+                e.preventDefault();
+                irSetlist(e.key === 'ArrowRight' ? 1 : -1);
+            }
         });
+
+
+        // =====================================================================
+        // MÚSICAS DO CULTO: navegar de uma cifra para a próxima
+        // =====================================================================
+        let setlistAtual = null; // { lista:[{repId,nome,tom,mid,idx}], i, semCifra:[], titulo }
+
+        function indiceNota(s) {
+            const m = String(s || '').trim().match(/^([A-Ga-g])([#b]?)/);
+            if (!m) return -1;
+            const raiz = m[1].toUpperCase() + m[2];
+            let i = escalaNotas.indexOf(raiz);
+            if (i < 0) i = escalaBemol.indexOf(raiz);
+            return i;
+        }
+        // Meios-tons de "de" até "para" (-5 a +6). Tom que não dá para ler: não transpõe.
+        function semitonsEntre(de, para) {
+            const a = indiceNota(de), b = indiceNota(para);
+            if (a < 0 || b < 0) return 0;
+            let d = (((b - a) % 12) + 12) % 12;
+            if (d > 6) d -= 12;
+            return d;
+        }
+
+        function cultoPorFonte(fonte, cid) {
+            const lista = fonte === 'ativa' ? cultos : ((historicoEscalas.find(h => idSeguro(h.id) === fonte) || {}).cultos || []);
+            return lista.find(c => idSeguro(c.id) === cid) || null;
+        }
+        function montarSetlist(culto) {
+            const lista = [], semCifra = [];
+            (culto.momentos || []).forEach(m => (m.musicas || []).forEach((mus, idx) => {
+                if (!mus.musica || !mus.musica.trim()) return;
+                const rep = mus.repId ? repertorio.find(r => r.id === mus.repId) : null;
+                if (rep) lista.push({ repId: rep.id, nome: rep.nome, tom: (mus.tom || '').trim(), mid: m.id, idx });
+                else semCifra.push(mus.musica.trim());
+            }));
+            return { lista, semCifra, titulo: culto.tipo || 'Culto', i: 0 };
+        }
+        function mostrarItemSetlist() {
+            const it = setlistAtual.lista[setlistAtual.i];
+            verCifraModal(it.repId, { setlist: true, tom: it.tom });
+        }
+        function abrirCifraEscala(fonte, cid, mid, idx) {
+            const culto = cultoPorFonte(fonte, cid);
+            if (!culto) return;
+            const sl = montarSetlist(culto);
+            const pos = sl.lista.findIndex(x => idSeguro(x.mid) === mid && x.idx === idx);
+            if (pos < 0) return;
+            sl.i = pos;
+            setlistAtual = sl;
+            mostrarItemSetlist();
+        }
+        function abrirCultoNoPalco(fonte, cid) {
+            const culto = cultoPorFonte(fonte, cid);
+            if (!culto) return;
+            const sl = montarSetlist(culto);
+            if (!sl.lista.length) { aviso('Nenhuma música deste culto está ligada a uma cifra do repertório.'); return; }
+            setlistAtual = sl;
+            mostrarItemSetlist();
+            aplicarPalco(true, false); // só nesta abertura: não muda sua preferência salva
+        }
+        function irSetlist(delta) {
+            if (!setlistAtual) return;
+            const n = setlistAtual.i + delta;
+            if (n < 0 || n >= setlistAtual.lista.length) return;
+            setlistAtual.i = n;
+            pararRolagem();
+            fecharListaSetlist();
+            mostrarItemSetlist();
+        }
+        function irParaSetlist(k) {
+            if (!setlistAtual || k < 0 || k >= setlistAtual.lista.length) return;
+            setlistAtual.i = k;
+            pararRolagem();
+            fecharListaSetlist();
+            mostrarItemSetlist();
+        }
+        function alternarListaSetlist() {
+            const l = document.getElementById('listaSetlist');
+            if (l) l.classList.toggle('hidden');
+        }
+        function fecharListaSetlist() {
+            const l = document.getElementById('listaSetlist');
+            if (l) l.classList.add('hidden');
+        }
+        function atualizarBarraSetlist() {
+            const barra = document.getElementById('barraSetlist');
+            if (!barra) return;
+            if (!setlistAtual) { barra.classList.add('hidden'); return; }
+            const { lista, i, semCifra, titulo } = setlistAtual;
+            barra.classList.remove('hidden');
+            document.getElementById('rotuloSetlist').innerText = `${i + 1} de ${lista.length} · ${lista[i].nome}`;
+            const ant = document.getElementById('btnSetlistAnterior'), prox = document.getElementById('btnSetlistProxima');
+            ant.disabled = i === 0; ant.style.opacity = i === 0 ? '0.4' : '1';
+            prox.disabled = i === lista.length - 1; prox.style.opacity = i === lista.length - 1 ? '0.4' : '1';
+            document.getElementById('listaSetlist').innerHTML =
+                `<div class="text-[11px] font-bold uppercase tracking-wider text-muted-custom px-2 pt-1">${esc(titulo)}</div>` +
+                lista.map((x, k) => `<button type="button" onclick="irParaSetlist(${k})" class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold flex justify-between gap-2 ${k === i ? 'dynamic-accent bg-white/10' : 'hover:bg-white/5'}"><span class="truncate">${k + 1}. ${esc(x.nome)}</span><span class="text-muted-custom">${esc(x.tom || '')}</span></button>`).join('') +
+                (semCifra.length ? `<div class="text-[11px] text-muted-custom italic px-2 pb-1">Sem cifra no repertório: ${esc(semCifra.join(', '))}</div>` : '');
+        }
 
         // =====================================================================
         // PWA: instalar no celular e abrir offline
