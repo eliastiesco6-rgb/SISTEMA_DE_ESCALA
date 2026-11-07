@@ -874,6 +874,9 @@
             saveTimer = setTimeout(salvarTudo, 700);
         }
 
+        // Também avisa quando o servidor CONFIRMA o que o cache já mostrava (ex.: documento que ainda não existe).
+        const OPCOES_SNAP = { includeMetadataChanges: true };
+
         function podeLerPrivado() { return !modoLocal && !modoPublico && !!usuario; }
         function nuvemPronta() { return pubCarregado && (!podeLerPrivado() || privCarregado); }
 
@@ -986,7 +989,7 @@
             if (podeLerPrivado()) {
                 if (unsubPriv) return;
                 const { db, doc, onSnapshot } = window.fb;
-                unsubPriv = onSnapshot(doc(db, ...DOC_PRIVADO), (snap) => {
+                unsubPriv = onSnapshot(doc(db, ...DOC_PRIVADO), OPCOES_SNAP, (snap) => {
                     privExiste = snap.exists();
                     privDoServidor = !snap.metadata.fromCache;
                     if (snap.exists() || privDoServidor) privCarregado = true;
@@ -1015,7 +1018,7 @@
                 tentarMigracao();
             });
 
-            onSnapshot(doc(db, ...DOC_PUBLICO), (snap) => {
+            onSnapshot(doc(db, ...DOC_PUBLICO), OPCOES_SNAP, (snap) => {
                 pubExiste = snap.exists();
                 pubDoServidor = !snap.metadata.fromCache;
                 if (snap.exists() || pubDoServidor) pubCarregado = true;
