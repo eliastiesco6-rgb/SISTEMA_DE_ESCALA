@@ -10,7 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Louvor">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -898,6 +898,7 @@
             if (!window.fb) { setStatus('Sem conexão com a nuvem. Alterações só neste aparelho.', 'rose'); return; }
             if (!nuvemPronta()) { setStatus('Aguardando carregar a nuvem...', 'amber'); return; }
             if (!pubExiste && privTemLegado && !legadoAplicado) aplicarLegado();
+            completarBandaDasEscalas();
 
             const pub = JSON.stringify(dadosPublicos());
             const priv = JSON.stringify(dadosPrivados());
@@ -964,9 +965,19 @@
             return bandaFixa.length || cantores.length || convidados.length || repertorio.length || cultos.length || historicoEscalas.length;
         }
 
+        // Escalas salvas antes da separação não têm a banda registrada, e o visitante não pode ler a banda fixa
+        // (ela é privada). Copia a banda atual para essas escalas uma única vez; as que já têm banda não mudam.
+        function completarBandaDasEscalas() {
+            if (!isEditor() || modoLocal || !nuvemPronta() || !pubDoServidor || !privDoServidor || !bandaFixa.length) return false;
+            let mudou = false;
+            historicoEscalas.forEach(h => { if (!Array.isArray(h.banda)) { h.banda = clone(bandaFixa); mudou = true; } });
+            return mudou;
+        }
+
         // Migração: leva o repertório/histórico do documento antigo para o público (sem perder nada).
         function tentarMigracao() {
             if (modoLocal || !isEditor() || !nuvemPronta() || !pubDoServidor || !privDoServidor) return;
+            if (!(!pubExiste && privTemLegado) && completarBandaDasEscalas()) { salvarTudo(); renderTudoSeguro(); aviso('Banda registrada nas escalas antigas.'); return; }
             if (!pubExiste && privTemLegado) {
                 aplicarLegado();
                 salvarTudo();
